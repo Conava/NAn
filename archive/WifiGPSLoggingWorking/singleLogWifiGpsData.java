@@ -8,6 +8,8 @@ import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.List;
 
+// will go through and add more comments once i get this pushed to gitHub
+
 public class singleLogWifiGpsData {
 
     public static String getAvailWifiInterfaces(Scanner scanner) {
