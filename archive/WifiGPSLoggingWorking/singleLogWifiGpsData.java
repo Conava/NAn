@@ -8,7 +8,7 @@ import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.List;
 
-// will go through and add more comments once i get this pushed to gitHub
+// will add more comments once I get this pushed to GitHub
 
 public class singleLogWifiGpsData {
 
