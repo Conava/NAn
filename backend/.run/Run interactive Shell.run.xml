@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run interactive Shell" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.cs250.nan.backend.BackendApplication" />
+    <module name="backend" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
