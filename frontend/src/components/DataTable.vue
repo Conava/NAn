@@ -26,4 +26,11 @@ th {
   border: 1px solid #ddd;
   text-align: left;
 }
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns content to the top */
+  justify-content: flex-start;
+  width: 100%;
+}
 </style>
