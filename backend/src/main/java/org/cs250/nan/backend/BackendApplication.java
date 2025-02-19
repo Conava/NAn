@@ -3,12 +3,27 @@ package org.cs250.nan.backend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Arrays;
-
 @SpringBootApplication
 public class BackendApplication {
 
     public static void main(String[] args) {
+        System.out.println("Starting the application...");
+
+        // Determine operating system and other environment details
+        String os = System.getProperty("os.name").toLowerCase();
+        String arch = System.getProperty("os.arch");
+        String javaVersion = System.getProperty("java.version");
+        String userHome = System.getProperty("user.home");
+        String userDir = System.getProperty("user.dir");
+
+        System.out.println("Operating System: " + os);
+        System.out.println("Architecture: " + arch);
+        System.out.println("Java Version: " + javaVersion);
+        System.out.println("User Home Directory: " + userHome);
+        System.out.println("Current Directory: " + userDir);
+
+        System.out.println("\n");
+
         if (args.length > 0) {
             switch (args[0]) {
                 case "-s":
