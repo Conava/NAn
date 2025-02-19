@@ -230,6 +230,8 @@ public class singleLogWifiGpsData {
         serialPort.closePort();
     }
 
+
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String wifiInterfaceName;
