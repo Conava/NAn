@@ -1,15 +1,15 @@
 package org.cs250.nan.backend;
 
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
 import java.io.*;
+import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 /*
 Notes:
 can't create subProcess in @BeforeEach due to declaring Process builder each time for each unique command line
-TODO: test with no input
-TODO: test SpringApplication with team
+TODO: create test for SpringApplication with team
+TODO: create test for printEnvironmentalDetails for exceptions (very low priority)
  */
 
 //commented as can't test with it
@@ -21,24 +21,20 @@ class BackendApplicationTests {
     }
     @BeforeEach
     //create new instance / clean up data before next test
-    void backendRefresh(){
-        System.out.println("Creating new instance:");
+    void preTest(){
+        System.out.print("Performing new test: ");
+    }
+    @AfterEach
+    void afterTest(){
+        System.out.println("Done");
     }
     @AfterAll
     static void cleanup(){
         System.out.println("Tests completed...");
     }
-
     @Test
-    void springApplicationTest() {
-        //System.out.println("test");
-
-        assertTrue(true);
-    }
-
-    @Test
-    @DisplayName("Test with anything that isn't a assigned command")
-    void mainTest() throws IOException, InterruptedException {
+    @DisplayName("Test with anything that isn't an assigned command")
+    void unknownParaTest() throws IOException, InterruptedException {
         // start BackendApplication in separate process
         // to support class having a self-termination
         ProcessBuilder processBuilder = new ProcessBuilder(
@@ -57,7 +53,8 @@ class BackendApplicationTests {
             output.append(line).append("\n");
         }
 
-        int exitCode = subProcess.waitFor(); // ensure subProcess was completed
+        // ensure subProcess was completed
+        int exitCode = subProcess.waitFor();
         assertEquals(1, exitCode, "Process should exit with code 1");
 
         // expected outputs
@@ -68,7 +65,7 @@ class BackendApplicationTests {
     }
 
     @Test
-    @DisplayName("Testing runScanMode")
+    @DisplayName("Testing runScanMode method via commandline")
     void runScanModeTest() throws IOException, InterruptedException {
         // start BackendApplication in separate process
         // to support class having a self-termination
@@ -92,13 +89,14 @@ class BackendApplicationTests {
         assertEquals(0, exitCode, "Process should exit with code 0");
 
         //expected outputs
-        String expectedOutput = "Running the one time scan...";
+        String expectedOutput = "Running the one-time scan...";
 
         //Asserts to check outputs below
         assertTrue(output.toString().contains(expectedOutput), "Expected output not found!");
     }
 
     @Test
+    @DisplayName("Test showHelp method via commandline")
     void showHelpTest() throws IOException, InterruptedException {
         // start BackendApplication in separate process
         // to support class having a self-termination
@@ -124,11 +122,15 @@ class BackendApplicationTests {
         // expected outputs
         String expectedOutput = """
                 Usage:
-                  -s, --scan   Start application in scan mode.
-                  -h, --help   Show help message.
-                  (no args)    Start application in interactive mode.
-                  """;
+                  -s, --scan   Perform a one time scan on the WiFi Access Points.
+                  -h, --help   Show help information.
+                  (no args)    Start application in interactive mode. Use 'help' in the interactive mode for more information.
+                   """;
         // asserts to check outputs
         assertTrue(output.toString().contains(expectedOutput), "Expected output not found!");
+    }
+    @Test
+    void springApplicationTest() {
+        assertTrue(true);
     }
 }
