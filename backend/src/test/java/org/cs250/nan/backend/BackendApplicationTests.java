@@ -5,15 +5,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-//committed as can't test with it
-//@SpringBootTest
-
 /*
-Note:
+Notes:
 can't create subProcess in @BeforeEach due to declaring Process builder each time for each unique command line
 TODO: test with no input
+TODO: test SpringApplication with team
  */
 
+//commented as can't test with it
+//@SpringBootTest
 class BackendApplicationTests {
     @BeforeAll
     static void loadInitialMain(){
@@ -29,14 +29,13 @@ class BackendApplicationTests {
         System.out.println("Tests completed...");
     }
 
-    /*
     @Test
-    void contextLoads() {
+    void springApplicationTest() {
         //System.out.println("test");
 
         assertTrue(true);
     }
-*/
+
     @Test
     @DisplayName("Test with anything that isn't a assigned command")
     void mainTest() throws IOException, InterruptedException {
