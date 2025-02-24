@@ -1,29 +1,14 @@
 package org.cs250.nan.backend;
 
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.context.SpringBootTest;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 //committed as can't test with it
 //@SpringBootTest
 
 class BackendApplicationTests {
-    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    private final PrintStream origionalOutput = System.out; //capture output for cross-referencing
-/*
-    @Mock
-private BackendApplication backendApplication;
-@InjectMocks
-//allow use of command line for tests
-private CommandLineRunner commandLineRunner;
-*/
     @BeforeAll
     static void loadInitialMain(){
         System.out.println("Initializing tests:");
@@ -32,12 +17,10 @@ private CommandLineRunner commandLineRunner;
     //create new instance / clean up data before next test
     void backendRefresh(){
         System.out.println("Creating new instance:");
-        //System.setOut(new PrintStream(outputStream)); // redirect output for testing
     }
     @AfterEach
     //Reset System.out to original
     void resetSystemOut(){
-        //System.setOut(origionalOutput);
     }
     @AfterAll
     static void cleanup(){
@@ -59,12 +42,33 @@ private CommandLineRunner commandLineRunner;
     }
 
     @Test
-    //@DisplayName("Testing runScanMode")
-    void runScanModeTest(){
+    @DisplayName("Testing runScanMode")
+    void runScanModeTest() throws IOException, InterruptedException {
         String expectedOutput = "Running the one time scan...";
-        BackendApplication.main(new String[]{"--scan"});
 
-        assertTrue(outputStream.toString().trim().contains(expectedOutput));
+        // start BackendApplication in separate process
+        // to support class having a self-termination
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "java", "-cp", "target/classes", "org.cs250.nan.backend.BackendApplication", "--scan"
+        );
+        processBuilder.redirectErrorStream(true); // allow grab of exceptions/errors
+        Process subProcess = processBuilder.start(); // output of the ran executed command line
+
+        // Capture output from subProcess
+        BufferedReader reader = new BufferedReader(new InputStreamReader(subProcess.getInputStream()));
+        StringBuilder output = new StringBuilder();
+
+        //Read each line from subProcess output, append to string for testing
+        String line;
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+
+        int exitCode = subProcess.waitFor(); // ensure subProcess was completed
+        assertEquals(0, exitCode, "Process should exit with code 0");
+
+        //Asserts to check outputs below
+        assertTrue(output.toString().contains(expectedOutput), "Expected output not found!");
     }
 
     @Test
