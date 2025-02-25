@@ -3,12 +3,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SingleGPSScanWindows {
-    String portName;
 
     public String getGPSData(String inputPortName) {
-        this.portName = inputPortName;
         StringBuilder output = new StringBuilder();
-        SerialPort serialPort = SerialPort.getCommPort(this.portName);
+        SerialPort serialPort = SerialPort.getCommPort(inputPortName);
         Map<String, String> gpsSentences = new HashMap<String, String>();
 
         // Set the baud rate and other serial port options, should probably turn this into a configuration file that is read by another class, passing the arguments to this class/method
@@ -84,7 +82,7 @@ public class SingleGPSScanWindows {
 
     public static void main(String[] args) {
         SingleGPSScanWindows gpsCollector = new SingleGPSScanWindows();
-        String result = gpsCollector.getGPSData();
+        String result = gpsCollector.getGPSData("COM3");
         System.out.println("\n\n\n\n\n");
         System.out.println(result);
     }
