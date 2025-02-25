@@ -55,7 +55,7 @@ public class ParseWiFiDataWindows {
         return jsonWiFiObjects;
     }
 
-    //overloaded function for testing, not to be used live
+    //Overloaded function for testing, not to be used live
     public List<JSONObject> parseStringToListOfJSON() {
         String wifiData = """
                 SSID 1 : ATTAuRigg31
