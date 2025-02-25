@@ -60,16 +60,13 @@ public class ShellCommands {
     @ShellMethod(value = "Display or update settings", key = "settings")
     public String settings(@ShellOption(defaultValue = "") String key, @ShellOption(defaultValue = "") String value) {
         if (key.isEmpty()) {
-            return String.format("dataStorage: %s\nlogFileStorage: %s\ndefaultUseOfGps: %s\nkeepHistory: %s\nactivateGui: %s",
-                    settings.getDataStorage(), settings.getLogFileStorage(), settings.isDefaultUseOfGps(),
+            return String.format("dataStorage: %s\ndefaultUseOfGps: %s\nkeepHistory: %s\nactivateGui: %s",
+                    settings.getDataStorage(), settings.isDefaultUseOfGps(),
                     settings.isKeepHistory(), settings.isActivateGui());
         } else {
             switch (key) {
                 case "dataStorage":
                     settings.setDataStorage(value);
-                    break;
-                case "logFileStorage":
-                    settings.setLogFileStorage(value);
                     break;
                 case "defaultUseOfGps":
                     settings.setDefaultUseOfGps(Boolean.parseBoolean(value));
@@ -95,7 +92,6 @@ public class ShellCommands {
                 "settings <key> <value> - Update a setting\n" +
                 "Available keys:\n" +
                 "dataStorage - Path to data storage directory\n" +
-                "logFileStorage - Path to log file storage directory\n" +
                 "defaultUseOfGps - true/false to enable/disable GPS by default\n" +
                 "keepHistory - true/false to keep or delete data from the last run\n" +
                 "activateGui - true/false to activate or deactivate the GUI by default";

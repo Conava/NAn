@@ -4,11 +4,20 @@ import java.io.*;
 import java.util.Properties;
 
 public class Settings {
-    private static final String CONFIG_FILE = System.getProperty("user.home") + File.separator + ".nan_backend_config.properties";
-    private Properties properties;
+    private static String DIR_PATH;
+    private static String CONFIG_FILE;
+    private final Properties properties;
 
     public Settings() {
         properties = new Properties();
+        String userHome = System.getProperty("user.home");
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            DIR_PATH = userHome + File.separator + "AppData" + File.separator + "Local" + File.separator + "NAn" + File.separator;
+        } else {
+            DIR_PATH = userHome + File.separator + ".config" + File.separator + "NAn" + File.separator;
+        }
+        CONFIG_FILE = DIR_PATH + "settings.conf";
         loadSettings();
     }
 
@@ -17,11 +26,12 @@ public class Settings {
             properties.load(input);
         } catch (IOException ex) {
             // Set default values if the config file does not exist
+            System.out.println("Config file not found. Using default settings.");
             properties.setProperty("dataStorage", "/default/data/storage");
-            properties.setProperty("logFileStorage", "/default/log/storage");
             properties.setProperty("defaultUseOfGps", "true");
             properties.setProperty("keepHistory", "true");
             properties.setProperty("activateGui", "true");
+            properties.setProperty("logFile", DIR_PATH + "log.txt");
             saveSettings();
         }
     }
@@ -40,14 +50,6 @@ public class Settings {
 
     public void setDataStorage(String dataStorage) {
         properties.setProperty("dataStorage", dataStorage);
-    }
-
-    public String getLogFileStorage() {
-        return properties.getProperty("logFileStorage");
-    }
-
-    public void setLogFileStorage(String logFileStorage) {
-        properties.setProperty("logFileStorage", logFileStorage);
     }
 
     public boolean isDefaultUseOfGps() {
@@ -72,5 +74,9 @@ public class Settings {
 
     public void setActivateGui(boolean activateGui) {
         properties.setProperty("activateGui", Boolean.toString(activateGui));
+    }
+
+    public String getLogFile() {
+        return properties.getProperty("logFile");
     }
 }
