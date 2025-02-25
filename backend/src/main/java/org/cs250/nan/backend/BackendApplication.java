@@ -1,5 +1,6 @@
 package org.cs250.nan.backend;
 
+import org.cs250.nan.backend.config.Settings;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication {
 
+    private static Settings settings;
+
     /**
      * Application entry point.
      *
@@ -19,7 +22,12 @@ public class BackendApplication {
      */
     public static void main(String[] args) {
         printEnvironmentDetails();
+        settings = new Settings();
         SpringApplication.run(BackendApplication.class, args);
+    }
+
+    public static Settings getSettings() {
+        return settings;
     }
 
 
