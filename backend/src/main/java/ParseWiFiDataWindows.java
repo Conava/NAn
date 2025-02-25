@@ -95,7 +95,7 @@ public class ParseWiFiDataWindows {
     //Main for testing purposes
     public static void main(String[] args) {
         ParseWiFiDataWindows test = new ParseWiFiDataWindows();
-        List<JSONObject> jsonWiFiObjects = new ArrayList<>();
+        List<JSONObject> jsonWiFiObjects;
         jsonWiFiObjects = test.parseStringToListOfJSON();
         System.out.println("\n\n\n\n\n");
         for (JSONObject data : jsonWiFiObjects) {
