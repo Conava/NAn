@@ -2,6 +2,8 @@ package org.cs250.nan.backend;
 
 import lombok.Getter;
 import org.cs250.nan.backend.config.Settings;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class BackendApplication {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackendApplication.class);
 
     @Getter
     private static Settings settings;
@@ -23,9 +26,13 @@ public class BackendApplication {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
-        printEnvironmentDetails();
         settings = new Settings();
+        System.setProperty("logging.file.name", settings.getLogFilePath());
+        LOGGER.info("Configured log file path: {}", settings.getLogFilePath());
+        LOGGER.info("Starting NAn NetworkAnalyzer...");
+        printEnvironmentDetails();
         SpringApplication.run(BackendApplication.class, args);
+        LOGGER.info("NAn started successfully.");
     }
 
     /**

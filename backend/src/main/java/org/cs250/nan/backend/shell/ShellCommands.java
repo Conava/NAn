@@ -2,6 +2,8 @@ package org.cs250.nan.backend.shell;
 
 import org.cs250.nan.backend.BackendApplication;
 import org.cs250.nan.backend.config.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -9,58 +11,96 @@ import org.springframework.shell.standard.ShellOption;
 @ShellComponent
 public class ShellCommands {
 
+    private static final Logger logger = LoggerFactory.getLogger(ShellCommands.class);
     private final Settings settings = BackendApplication.getSettings();
 
-    // Basic command for testing
     @ShellMethod(value = "Print a greeting message", key = "hello")
     public String hello(@ShellOption(defaultValue = "User") String name) {
-        return String.format("Hello, %s!", name);
+        logger.debug("Entering hello command with parameter: {}", name);
+        String greeting = String.format("Hello, %s!", name);
+        logger.info("Greeting generated: {}", greeting);
+        logger.debug("Exiting hello command");
+        return greeting;
     }
 
     @ShellMethod(value = "Perform a one time scan", key = "scan")
     public String scan() {
-        return "Scan initiated";
+        logger.debug("Entering scan command");
+        String result = "Scan initiated";
+        logger.info("Scan command executed");
+        logger.debug("Exiting scan command");
+        return result;
     }
 
     @ShellMethod(value = "Start continuous scan monitoring", key = "monitor")
     public String monitor() {
-        return "Continuous scan monitoring started";
+        logger.debug("Entering monitor command");
+        String result = "Continuous scan monitoring started";
+        logger.info("Monitor command executed");
+        logger.debug("Exiting monitor command");
+        return result;
     }
 
     @ShellMethod(value = "Open API", key = "openApi")
     public String openApi() {
-        return "API opened";
+        logger.debug("Entering openApi command");
+        String result = "API opened";
+        logger.info("Open API command executed");
+        logger.debug("Exiting openApi command");
+        return result;
     }
 
     @ShellMethod(value = "Close API", key = "closeApi")
     public String closeApi() {
-        return "API closed";
+        logger.debug("Entering closeApi command");
+        String result = "API closed";
+        logger.info("Close API command executed");
+        logger.debug("Exiting closeApi command");
+        return result;
     }
 
     @ShellMethod(value = "View the latest scan data", key = "latestScan")
     public String latestScan() {
-        return "Latest scan data displayed";
+        logger.debug("Entering latestScan command");
+        String result = "Latest scan data displayed";
+        logger.info("LatestScan command executed");
+        logger.debug("Exiting latestScan command");
+        return result;
     }
 
     @ShellMethod(value = "Open web interface", key = "openWeb")
     public String openWeb() {
-        return "Web interface opened";
+        logger.debug("Entering openWeb command");
+        String result = "Web interface opened";
+        logger.info("openWeb command executed");
+        logger.debug("Exiting openWeb command");
+        return result;
     }
 
     @ShellMethod(value = "Export data", key = "export")
     public String export() {
-        return "Data export initiated";
+        logger.debug("Entering export command");
+        String result = "Data export initiated";
+        logger.info("Export command executed");
+        logger.debug("Exiting export command");
+        return result;
     }
 
     @ShellMethod(value = "Restart the application", key = "restart")
     public String restart() {
-        return "Application restarting...";
+        logger.debug("Entering restart command");
+        String result = "Application restarting...";
+        logger.info("Restart command executed");
+        logger.debug("Exiting restart command");
+        return result;
     }
 
     @ShellMethod(value = "Display or update settings", key = "settings")
     public String settings(@ShellOption(defaultValue = "") String key, @ShellOption(defaultValue = "") String value) {
+        logger.debug("Entering settings command; key: {}, value: {}", key, value);
+        String result;
         if (key.isEmpty()) {
-            return String.format("dataStorage: %s\ndefaultUseOfGps: %s\nkeepHistory: %s\nactivateGui: %s",
+            result = String.format("dataStorage: %s\ndefaultUseOfGps: %s\nkeepHistory: %s\nactivateGui: %s",
                     settings.getDataStorage(), settings.isDefaultUseOfGps(),
                     settings.isKeepHistory(), settings.isActivateGui());
         } else {
@@ -78,16 +118,20 @@ public class ShellCommands {
                     settings.setActivateGui(Boolean.parseBoolean(value));
                     break;
                 default:
+                    logger.warn("Invalid setting key attempted: {}", key);
                     return "Invalid setting key.";
             }
             settings.saveSettings();
-            return "Setting updated.";
+            result = "Setting updated.";
         }
+        logger.info("Exiting settings command with result: {}", result);
+        return result;
     }
 
     @ShellMethod(value = "Help for settings command", key = "helpSettings")
     public String helpSettings() {
-        return "Settings command usage:\n" +
+        logger.debug("Entering helpSettings command");
+        String helpMessage = "Settings command usage:\n" +
                 "settings - Display all settings\n" +
                 "settings <key> <value> - Update a setting\n" +
                 "Available keys:\n" +
@@ -95,6 +139,8 @@ public class ShellCommands {
                 "defaultUseOfGps - true/false to enable/disable GPS by default\n" +
                 "keepHistory - true/false to keep or delete data from the last run\n" +
                 "activateGui - true/false to activate or deactivate the GUI by default";
+        logger.info("HelpSettings command executed");
+        logger.debug("Exiting helpSettings command");
+        return helpMessage;
     }
 }
-
