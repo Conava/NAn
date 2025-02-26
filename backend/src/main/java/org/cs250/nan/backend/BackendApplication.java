@@ -30,7 +30,7 @@ public class BackendApplication {
         System.setProperty("logging.file.name", settings.getLogFilePath());
         LOGGER.info("Configured log file path: {}", settings.getLogFilePath());
         LOGGER.info("Starting NAn NetworkAnalyzer...");
-        printEnvironmentDetails();
+        LOGGER.info(getEnvironmentDetails());
         SpringApplication.run(BackendApplication.class, args);
         LOGGER.info("NAn started successfully.");
     }
@@ -42,13 +42,12 @@ public class BackendApplication {
      * and current working directory.
      * </p>
      */
-    private static void printEnvironmentDetails() {
-        System.out.println("Environment Details:");
-        System.out.println("Operating System: " + System.getProperty("os.name").toLowerCase());
-        System.out.println("Architecture    : " + System.getProperty("os.arch"));
-        System.out.println("Java Version    : " + System.getProperty("java.version"));
-        System.out.println("User Home Dir   : " + System.getProperty("user.home"));
-        System.out.println("Current Dir     : " + System.getProperty("user.dir"));
-        System.out.println();
+    private static String getEnvironmentDetails() {
+        return "Environment Details:\n" +
+                "Operating System: " + System.getProperty("os.name").toLowerCase() + "\n" +
+                "Architecture    : " + System.getProperty("os.arch") + "\n" +
+                "Java Version    : " + System.getProperty("java.version") + "\n" +
+                "User Home Dir   : " + System.getProperty("user.home") + "\n" +
+                "Current Dir     : " + System.getProperty("user.dir") + "\n";
     }
 }
