@@ -20,17 +20,20 @@ This project uses **Spring Boot** for the main application framework and integra
 - **Spring Shell** for interactive command support.
 - **Spring Boot Actuator** for providing health checks and bean inspection.
 - **Logback** for customizable logging via a dedicated configuration file.
+- **RESTful API** for network analysis and data retrieval.
 
 ## Prerequisites
-- **Java (JDK 11 or later)** — for building and running the project.
+- **Java (JDK 23 or later)** — for building and running the project.
 - **Maven** — for dependency management and build tasks.
-- **Linux operating system** — tested on Linux-based environments.
-- **IDE (optional)** — such as IntelliJ IDEA 2024.3.3, useful for debugging or code inspection.
+- **Linux or Windows operating system** 
+- **IDE (optional)** — such as IntelliJ IDEA 2024.3.3, for debugging or code inspection.
+- **Curl or Postman** — for testing the RESTful API endpoints.
+- **Git** — for cloning the repository and version control.
 
 ## Installation
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/Conava/NAn.git
 cd your-repo
 ```
 2. Make sure you have the correct Java version and Maven installed. Verify them:
@@ -38,7 +41,7 @@ cd your-repo
 java -version
 mvn -v
 ```
-3. (Optional) Open the project in your IDE for advanced features.
+3. (Optional) Open the project in your IDE for advanced features. It includes configuration files for IntelliJ IDEA.
 
 ## Running the Application
 1. From the project root, run the application with Maven:
@@ -46,7 +49,7 @@ mvn -v
 mvn spring-boot:run
 ```
 2. By default, the service listens for HTTP requests on port **8080**.  
-3. To see the interactive commands, type any recognized Spring Shell command in the same console.
+3. The interactive Spring shell will open up. Type `help` to see available commands.
 
 ## Testing
 1. Unit and integration tests can be run with:
@@ -67,10 +70,10 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_
 ```bash
 mvn clean package
 ```
-2. The final JAR is located in `target/backend-0.0.1-SNAPSHOT.jar` (name may vary).  
+2. The final JAR is located in `target/NAn-{version}-{edition}.jar` (name and version may vary).  
 3. Deploy or copy the JAR to your server, then run:
 ```bash
-java -jar backend-0.0.1-SNAPSHOT.jar
+java -jar NAn-{version}-{edition}.jar
 ```
 
 ## API Usage
@@ -79,6 +82,17 @@ java -jar backend-0.0.1-SNAPSHOT.jar
 ```bash
 curl http://localhost:8080/api/your-endpoint
 ```
+
+### API Endpoints
+[TODO: Add actual Endpoints]
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/analyze` | POST | Analyze a network and return the results. |
+| `/api/analyze/{id}` | GET | Retrieve the results of a previous analysis by ID. |
+| `/api/analyze/{id}` | DELETE | Delete the results of a previous analysis by ID. |
+| `/api/analyze` | DELETE | Delete all previous analysis results. |
+
 
 ## Environment & Spring Variables
 - **Interactive Shell**: `spring.shell.interactive.enabled=true` in `application.properties`
@@ -97,3 +111,6 @@ curl http://localhost:8080/api/your-endpoint
 - **Maven Compiler Plugin**
 - **Lombok** (for boilerplate reduction)
 - **Logback** (for rolling file logging)
+- **JUnit 5** (for testing)
+- **Mockito** (for mocking in tests)
+- **Spring Boot Starter Test** (for testing Spring Boot applications)
