@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class SingleGPSScanWindows {
 
-    public String getGPSData(String inputPortName) {
+    public String getAllGPSData(String inputPortName) {
         StringBuilder output = new StringBuilder();
         SerialPort serialPort = SerialPort.getCommPort(inputPortName);
         Map<String, String> gpsSentences = new HashMap<String, String>();
@@ -76,13 +76,13 @@ public class SingleGPSScanWindows {
         return output.toString();
     }
 
-    public String getGPSData() {
-        return getGPSData("COM3");
+    public String getAllGPSData() {
+        return getAllGPSData("COM3");
     }
 
     public static void main(String[] args) {
         SingleGPSScanWindows gpsCollector = new SingleGPSScanWindows();
-        String result = gpsCollector.getGPSData("COM3");
+        String result = gpsCollector.getAllGPSData("COM3");
         System.out.println("\n\n\n\n\n");
         System.out.println(result);
     }
