@@ -1,5 +1,6 @@
 package org.cs250.nan.backend;
 
+import lombok.Getter;
 import org.cs250.nan.backend.config.Settings;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication {
 
+    @Getter
     private static Settings settings;
 
     /**
@@ -25,11 +27,6 @@ public class BackendApplication {
         settings = new Settings();
         SpringApplication.run(BackendApplication.class, args);
     }
-
-    public static Settings getSettings() {
-        return settings;
-    }
-
 
     /**
      * Prints the environment details for diagnostic purposes.
