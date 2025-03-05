@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
+
 /**
  * Main application entry point for the backend.
  * <p>
@@ -16,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackendApplication.class);
+    private static final List<String> VALID_OPTIONS = List.of(""); // Empty for now as program arguments are not supported.
 
     @Getter
     private static Settings settings;
@@ -26,6 +29,12 @@ public class BackendApplication {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
+        for (String arg : args) {
+            if (!VALID_OPTIONS.contains(arg)) {
+                System.err.println("Unknown command line parameter: " + arg);
+                System.exit(1);
+            }
+        }
         settings = new Settings();
         System.setProperty("logging.file.name", settings.getLogFilePath());
         LOGGER.info("Configured log file path: {}", settings.getLogFilePath());
