@@ -1,6 +1,7 @@
-import com.fazecast.jSerialComm.SerialPort; //needed for this to work, it provides the ability to interact with the
-// gps device, I've included it in the pom.xml file/maven, but if you're having trouble, you may need to manually
-// add the .jar file, let me knoe if you have issues (mason)
+package org.cs250.nan.backend.shell;
+
+import com.fazecast.jSerialComm.SerialPort;
+
 import java.util.HashMap;
 import java.util.Map;
 

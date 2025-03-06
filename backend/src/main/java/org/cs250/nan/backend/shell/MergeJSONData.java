@@ -1,4 +1,7 @@
-import org.json.JSONObject; // necessary dependency to work with JSONObjects, I've added them to pom.xml/maven but not sure if it will work. May need to add the .jar file manually, let me know if there are issues (mason)
+package org.cs250.nan.backend.shell;
+
+import org.json.JSONObject;
+
 import java.util.List;
 
 //This class has one method that takes the output from ParseWiFiDataWindows and ParseGPSData and merges the json info into a list of JSON objects, such that each WiFi json object gains all the gps data

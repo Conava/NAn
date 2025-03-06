@@ -1,5 +1,7 @@
-import org.json.JSONObject; //required to work, I've included this in the pom.xml file/Maven, but I'm not sure how that
-// works, you might need to manually include the .jar file, let me know if you have issues (mason)
+package org.cs250.nan.backend.shell;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.Map;
 public class ParseWiFiDataWindows {
 //this class takes in the string output from SingleWiFiScanWindows and converts it into JSON format
 
-    public List<JSONObject> parseStringToListOfJSON(String wifiData) {
+    public static List<JSONObject> parseStringToListOfJSON(String wifiData) {
         List<Map<String, String>> uniqueBSSIDs = new ArrayList<>(); //initialize the list of maps; these maps will each
         //become an individual JSON object, uniquely identified by their individual "MAC" key-value pairs
         Map<String, String> currentMap = null; //initialize a map to hold individual sets of WiFi data, based on BSSID/MAC
