@@ -4,6 +4,8 @@ import org.cs250.nan.backend.BackendApplication;
 import org.cs250.nan.backend.config.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -142,5 +144,19 @@ public class ShellCommands {
         logger.info("HelpSettings command executed");
         logger.debug("Exiting helpSettings command");
         return helpMessage;
+    }
+
+    @ShellMethod(value = "Exit the application", key = "exit")
+    public void exit() {
+        logger.debug("Entering exit command");
+        SpringApplication.exit(BackendApplication.getApplicationContext(), () -> 0);
+        logger.info("Exit command executed");
+        logger.debug("Exiting exit command");
+        System.exit(0);
+    }
+
+    @ShellMethod(value= "Exit the application", key = "quit")
+    public void quit() {
+        exit();
     }
 }
