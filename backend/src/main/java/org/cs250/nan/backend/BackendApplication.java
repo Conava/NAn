@@ -16,20 +16,25 @@ import java.util.List;
  * This class starts the Spring Boot application.
  * </p>
  */
+@Getter
 @SpringBootApplication
 public class BackendApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackendApplication.class);
     private static final List<String> VALID_OPTIONS = List.of(""); // Empty for now as program arguments are not supported.
-
     /**
      * -- GETTER --
-     *  Returns the Spring application context.
+     *  Returns the application context.
      *
-     * @return The Spring application context.
+     * @return The application context.
      */
     @Getter
     private static ApplicationContext applicationContext;
-
+    /**
+     * -- GETTER --
+     *  Returns the application settings.
+     *
+     * @return The application settings.
+     */
     @Getter
     private static Settings settings;
 
@@ -69,4 +74,5 @@ public class BackendApplication {
                 "User Home Dir   : " + System.getProperty("user.home") + "\n" +
                 "Current Dir     : " + System.getProperty("user.dir") + "\n";
     }
+
 }
