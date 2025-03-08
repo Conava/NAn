@@ -28,11 +28,8 @@ class BackendApplicationTest {
     @Test
     @DisplayName("Test with unsupported command line parameter 'invalidParam'")
     void unknownCommandLineParameterTest() throws IOException, InterruptedException {
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                "mvn", "spring-boot:run", "-Dspring-boot.run.arguments=invalidParam"
-        );
-        processBuilder.redirectErrorStream(true);
-        Process subProcess = processBuilder.start();
+        String osName = System.getProperty("os.name").toLowerCase();
+        Process subProcess = getProcess(osName);
 
         // Capture output
         BufferedReader reader = new BufferedReader(new InputStreamReader(subProcess.getInputStream()));
@@ -49,6 +46,21 @@ class BackendApplicationTest {
         // Check for expected error message
         assertTrue(output.toString().contains("Unknown command line parameter:"),
                 "Expected 'Unknown command line parameter' not found!");
+    }
+
+    private static Process getProcess(String osName) throws IOException {
+        ProcessBuilder processBuilder;
+        if (osName.contains("win")) {
+            processBuilder = new ProcessBuilder(
+                    "cmd.exe", "/c", "mvn", "spring-boot:run", "-Dspring-boot.run.arguments=invalidParam"
+            );
+        } else {
+            processBuilder = new ProcessBuilder(
+                    "mvn", "spring-boot:run", "-Dspring-boot.run.arguments=invalidParam"
+            );
+        }
+        processBuilder.redirectErrorStream(true);
+        return processBuilder.start();
     }
 
     @Test
