@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
@@ -15,11 +16,25 @@ import java.util.List;
  * This class starts the Spring Boot application.
  * </p>
  */
+@Getter
 @SpringBootApplication
 public class BackendApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackendApplication.class);
     private static final List<String> VALID_OPTIONS = List.of(""); // Empty for now as program arguments are not supported.
-
+    /**
+     * -- GETTER --
+     *  Returns the application context.
+     *
+     * @return The application context.
+     */
+    @Getter
+    private static ApplicationContext applicationContext;
+    /**
+     * -- GETTER --
+     *  Returns the application settings.
+     *
+     * @return The application settings.
+     */
     @Getter
     private static Settings settings;
 
@@ -40,7 +55,7 @@ public class BackendApplication {
         LOGGER.info("Configured log file path: {}", settings.getLogFilePath());
         LOGGER.info("Starting NAn NetworkAnalyzer...");
         LOGGER.info(getEnvironmentDetails());
-        SpringApplication.run(BackendApplication.class, args);
+        applicationContext = SpringApplication.run(BackendApplication.class, args);
         LOGGER.info("NAn started successfully.");
     }
 
@@ -59,4 +74,5 @@ public class BackendApplication {
                 "User Home Dir   : " + System.getProperty("user.home") + "\n" +
                 "Current Dir     : " + System.getProperty("user.dir") + "\n";
     }
+
 }
