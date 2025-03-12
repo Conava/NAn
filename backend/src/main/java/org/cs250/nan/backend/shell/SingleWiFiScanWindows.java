@@ -11,13 +11,13 @@ public class SingleWiFiScanWindows {
     public static String scan(String interfaceName) {
         //this will return a long string with all teh WiFi data in it. This return has a hardcoded processbuilder to be run if a string parameter is
         // provided, if not this method is overloaded and the other parameter-less version will run
-        return runScan(new ProcessBuilder("powershell.exe", "-Command", "netsh wlan show networks interface=" + interfaceName + " mode=bssid | " + "Select-String 'SSID|Signal|Band|Encryption|Authentication|Radio type|Connected stations|Channel utilization'"));
+        return runScan(new ProcessBuilder("powershell.exe", "-Command", "netsh wlan show networks interface=\\\"" + interfaceName + "\\\" mode=Bssid | " + "Select-String 'SSID|Signal|Band|Encryption|Authentication|Radio type|Connected stations|Channel utilization'"));
     }
 
     // Overloaded method without interface name; runs if not parameter is provided, defaults to use the standard onboard WiFi interface that is currently
     // operational and in use by the OS
     public static String scan() {
-        return runScan(new ProcessBuilder("powershell.exe", "-Command", "netsh wlan show networks mode=bssid | " + "Select-String 'SSID|Signal|Band|Encryption|Authentication|Radio type|Connected stations|Channel utilization'"));
+        return runScan(new ProcessBuilder("powershell.exe", "-Command", "netsh wlan show networks mode=Bssid | " + "Select-String 'SSID|Signal|Band|Encryption|Authentication|Radio type|Connected stations|Channel utilization'"));
     }
 
     //take the processbuilder and executes it, returning the long string of all the WiFi data collected
@@ -44,8 +44,8 @@ public class SingleWiFiScanWindows {
     }
     //main function for testing purposes
     public static void main(String[] args) {
-        System.out.println(scan("Wi-Fi"));
         System.out.println(scan());
+//        System.out.println(scan());
     }
 
 }
