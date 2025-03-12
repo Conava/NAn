@@ -54,9 +54,7 @@ public class ContinuousWiFiGPSScanWindows {
         running.set(false);
     }
 
-    public static void main(String[] args) {
         ContinuousWiFiGPSScanWindows contScan = new ContinuousWiFiGPSScanWindows();
-        List <JSONObject> jsonWiFiObjects = contScan.scan(4, 8);
 //        System.out.println("\n\n\n\n\n");
         for (JSONObject data : jsonWiFiObjects) { //iterate through the JSON objects, printing each
             System.out.println(data.toString(4));
