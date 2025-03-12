@@ -19,11 +19,15 @@ public class ParseWiFiDataWindows {
         String[] lineKeyValPair; //initialize string array that will hold a key in index 0, and it's value in index 1
 
         String[] lines = wifiData.split("\n"); //split the provided argument into individual lines
+        boolean firstSSIDFound = false;
 
         for (int i = 0; i < lines.length; ++i) { //iterate through all the lines
             lines[i] = lines[i].trim(); //time leading and trailing whitespace from each line
-            if (lines[i].isEmpty()) { // skips the line if it is just an empty/white-space-filled line
+            if (!lines[i].startsWith("SSID") && !firstSSIDFound) { // Skips lines until the first SSID is encountered
                 continue;
+            }
+            else {
+                firstSSIDFound = true;
             }
             if (lines[i].startsWith("SSID")) { //check for lines that start with SSID
                 lineKeyValPair = lines[i].split(":"); //split that line, capturing the SSID name in index 1
@@ -100,48 +104,634 @@ public class ParseWiFiDataWindows {
     //if no string is provided to the primary method, this overloaded method will execute instead
     public static List<JSONObject> parseStringToListOfJSON() {
         String wifiData = """
-                SSID 1 : LwCastle
-                                                                       Authentication          : WPA2-Personal
-                                                                       Encryption              : CCMP\s
-                                                                       BSSID 1                 : d0:fc:d0:72:5b:28
-                                                                            Signal             : 13% \s
-                                                                            Radio type         : 802.11ax
-                                                                            Band               : 5 GHz
-                                                                                Connected Stations:         
-                                                                                Channel Utilization:        117 (45 %)
-                                                                   SSID 2 : PollyPocketTours
-                                                                       Authentication          : WPA2-Personal
-                                                                       Encryption              : \s
-                                                                       BSSID 1                 : e6:ae:34:21:d7:f3
-                                                                            Signal             : 46% \s
-                                                                            Radio type         : 802.11ac
-                                                                            Band               : 5 GHz
-                                                                                Connected Stations:         2
-                                                                                Channel Utilization:        37 (14 %)
-                                                                   SSID 3 :\s
-                                                                       Authentication          : WPA2-Personal
-                                                                       Encryption              : CCMP\s
-                                                                       BSSID 1                 : fc:ae:34:21:d7:f3
-                                                                            Signal             : 46% \s
-                                                                            Radio type         : 802.11ac
-                                                                            Band               :
-                                                                                Connected Stations:         0
-                                                                                Channel Utilization:        37 (14 %)
-                                                                   SSID 4 : ATTAuRigg31
-                                                                       Authentication          : WPA2-Personal
-                                                                       Encryption              : CCMP\s
-                                                                       BSSID 1                 : 
-                                                                            Signal             : 80% \s
-                                                                            Radio type         : 802.11ax
-                                                                            Band               : 5 GHz
-                                                                                Connected Stations:         0
-                                                                                Channel Utilization:        20 (7 %)
-                                                                       BSSID 2                 : 10:c4:ca:dd:64:0c
-                                                                            Signal             :  \s
-                                                                            Radio type         : 802.11ax
-                                                                            Band               : 5 GHz
-                                                                                Connected Stations:         3
-                                                                                Channel Utilization:        108 (42 %)
+                Usage: show networks [[interface=]<string>] [[mode=]ssid/bssid]
+                        mode          - Get detailed bssid information.
+                        Parameter interface and bssid are both optional.
+                        If mode=bssid is given then the visible bssids for each ssid
+                        will also be listed. Otherwise only ssids will be listed.
+                        show networks mode=Bssid
+                
+                
+                SSID 1 : SDSU_Guest
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 84:d4:7e:69:95:b1
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 2                 : 84:d4:7e:69:8a:01
+                             Signal             : 65% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 3                 : 84:d4:7e:69:7d:01
+                             Signal             : 29% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:87:81
+                             Signal             : 35% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:89:91
+                             Signal             : 26% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:95:a1
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 7                 : 84:d4:7e:69:89:81
+                             Signal             : 50% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 8                 : 84:d4:7e:69:8a:11
+                             Signal             : 26% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:8e:01
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 10                 : 84:d4:7e:69:83:21
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 11                 : 7c:57:3c:be:5e:41
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:7d:71
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : 84:d4:7e:69:82:91
+                             Signal             : 82% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 14                 : 84:d4:7e:69:83:31
+                             Signal             : 83% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 15                 : 84:d4:7e:69:8e:11
+                             Signal             : 57% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : 84:d4:7e:69:7d:11
+                             Signal             : 20% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:80:71
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 18                 : 7c:57:3c:be:5e:51
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 19                 : 84:d4:7e:69:80:61
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 20                 : 84:d4:7e:69:82:81
+                             Signal             : 87% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 2 : eduroam
+                        Authentication          : WPA2-Enterprise
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 84:d4:7e:69:95:b0
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 2                 : 84:d4:7e:69:8a:00
+                             Signal             : 65% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 3                 : 84:d4:7e:69:89:80
+                             Signal             : 50% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:95:a0
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:89:90
+                             Signal             : 24% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:7d:70
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 7                 : 84:d4:7e:69:8e:00
+                             Signal             : 75% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 8                 : fc:7f:f1:f9:01:30
+                             Signal             : 24% \s
+                             Radio type         : 802.11ax
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:83:20
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 10                 : 84:d4:7e:69:82:90
+                             Signal             : 82% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 11                 : 84:d4:7e:69:83:30
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:8e:10
+                             Signal             : 57% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : 84:d4:7e:69:7d:10
+                             Signal             : 22% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 14                 : 84:d4:7e:69:80:70
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 15                 : 7c:57:3c:be:5e:50
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : 7c:57:3c:be:5e:40
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:80:60
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 18                 : 84:d4:7e:69:82:80
+                             Signal             : 87% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 3 : HP-Print-29-LaserJet 400 color
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 08:3e:8e:72:b3:29
+                             Signal             : 29% \s
+                             Radio type         : 802.11g
+                             Band               : 2.4 GHz
+                    SSID 4 : DIRECT-9C-HP DeskJet 4100 series
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:81:40:1b:a6:9d
+                             Signal             : 38% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 5 : NETGEAR00
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : a0:63:91:32:e7:40
+                             Signal             : 31% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 6 : DIRECT-73-HP M479fdw Color LJ
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 02:68:eb:f2:51:73
+                             Signal             : 38% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 7 : rtec
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4e
+                             Signal             : 60% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 8 : rtec_5G
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4d
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                                 Connected Stations:         1
+                                 Channel Utilization:        0 (0 %)
+                    SSID 9 : DIRECT-91-HP OfficeJet Pro 9130e
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 2e:58:b9:99:64:91
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 10 : DIRECT-15-HP M283 LaserJet
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : ce:5e:f8:5b:19:15
+                             Signal             : 35% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                
+                
+                
+                
+                    SSID 1 : SDSU_Guest
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 84:d4:7e:69:95:b1
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 2                 : 84:d4:7e:69:8a:01
+                             Signal             : 65% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 3                 : 84:d4:7e:69:7d:01
+                             Signal             : 29% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:87:81
+                             Signal             : 35% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:89:91
+                             Signal             : 26% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:95:a1
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 7                 : 84:d4:7e:69:89:81
+                             Signal             : 50% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 8                 : 84:d4:7e:69:8a:11
+                             Signal             : 26% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:8e:01
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 10                 : 84:d4:7e:69:83:21
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 11                 : 7c:57:3c:be:5e:41
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:7d:71
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : 84:d4:7e:69:82:91
+                             Signal             : 82% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 14                 : 84:d4:7e:69:83:31
+                             Signal             : 83% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 15                 : 84:d4:7e:69:8e:11
+                             Signal             : 57% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : 84:d4:7e:69:7d:11
+                             Signal             : 20% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:80:71
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 18                 : 7c:57:3c:be:5e:51
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 19                 : 84:d4:7e:69:80:61
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 20                 : 84:d4:7e:69:82:81
+                             Signal             : 87% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 2 : eduroam
+                        Authentication          : WPA2-Enterprise
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 84:d4:7e:69:95:b0
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 2                 : 84:d4:7e:69:8a:00
+                             Signal             : 65% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 3                 : 84:d4:7e:69:89:80
+                             Signal             : 50% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:95:a0
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:89:90
+                             Signal             : 24% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:7d:70
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 7                 : 84:d4:7e:69:8e:00
+                             Signal             : 75% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 8                 : fc:7f:f1:f9:01:30
+                             Signal             : 24% \s
+                             Radio type         : 802.11ax
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:83:20
+                             Signal             : 72% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 10                 : 84:d4:7e:69:82:90
+                             Signal             : 82% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 11                 : 84:d4:7e:69:83:30
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:8e:10
+                             Signal             : 57% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : 84:d4:7e:69:7d:10
+                             Signal             : 22% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 14                 : 84:d4:7e:69:80:70
+                             Signal             : 80% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 15                 : 7c:57:3c:be:5e:50
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : 7c:57:3c:be:5e:40
+                             Signal             : 35% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:80:60
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 18                 : 84:d4:7e:69:82:80
+                             Signal             : 87% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 3 : HP-Print-29-LaserJet 400 color
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 08:3e:8e:72:b3:29
+                             Signal             : 29% \s
+                             Radio type         : 802.11g
+                             Band               : 2.4 GHz
+                    SSID 4 : DIRECT-9C-HP DeskJet 4100 series
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:81:40:1b:a6:9d
+                             Signal             : 38% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 5 : NETGEAR00
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : a0:63:91:32:e7:40
+                             Signal             : 31% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 6 : DIRECT-73-HP M479fdw Color LJ
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 02:68:eb:f2:51:73
+                             Signal             : 38% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 7 : rtec
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4e
+                             Signal             : 60% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 8 : rtec_5G
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4d
+                             Signal             : 33% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                                 Connected Stations:         1
+                                 Channel Utilization:        0 (0 %)
+                    SSID 9 : DIRECT-91-HP OfficeJet Pro 9130e
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 2e:58:b9:99:64:91
+                             Signal             : 40% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 10 : DIRECT-15-HP M283 LaserJet
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : ce:5e:f8:5b:19:15
+                             Signal             : 35% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 1 : eduroam
+                        Authentication          : WPA2-Enterprise
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 84:d4:7e:69:82:80
+                             Signal             : 100% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 2                 : 84:d4:7e:69:82:90
+                             Signal             : 100% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 3                 : 84:d4:7e:69:80:60
+                             Signal             : 90% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:83:20
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:83:30
+                             Signal             : 84% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:8e:00
+                             Signal             : 68% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 7                 : 84:d4:7e:69:8e:10
+                             Signal             : 60% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 8                 : 84:d4:7e:69:80:70
+                             Signal             : 60% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:7d:70
+                             Signal             : 58% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 10                 : 84:d4:7e:69:8a:10
+                             Signal             : 42% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 11                 : 84:d4:7e:69:7d:10
+                             Signal             : 42% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:95:b0
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : 7c:57:3c:be:5e:40
+                             Signal             : 34% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 14                 : fc:7f:f1:f9:01:30
+                             Signal             : 32% \s
+                             Radio type         : 802.11ax
+                             Band               : 5 GHz
+                        BSSID 15                 : a8:bd:27:f6:f4:f0
+                             Signal             : 22% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : 84:d4:7e:69:89:90
+                             Signal             : 20% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:89:d0
+                             Signal             : 18% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                    SSID 2 : SDSU_Guest
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 84:d4:7e:69:82:81
+                             Signal             : 100% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 2                 : 84:d4:7e:69:82:91
+                             Signal             : 100% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 3                 : 84:d4:7e:69:80:61
+                             Signal             : 90% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 4                 : 84:d4:7e:69:83:21
+                             Signal             : 86% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 5                 : 84:d4:7e:69:83:31
+                             Signal             : 84% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 6                 : 84:d4:7e:69:8e:01
+                             Signal             : 70% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                        BSSID 7                 : 84:d4:7e:69:8e:11
+                             Signal             : 62% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 8                 : 84:d4:7e:69:80:71
+                             Signal             : 60% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 9                 : 84:d4:7e:69:7d:71
+                             Signal             : 60% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 10                 : 84:d4:7e:69:8a:11
+                             Signal             : 44% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 11                 : 84:d4:7e:69:7d:11
+                             Signal             : 42% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 12                 : 84:d4:7e:69:95:b1
+                             Signal             : 40% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 13                 : fc:7f:f1:f9:01:31
+                             Signal             : 32% \s
+                             Radio type         : 802.11ax
+                             Band               : 5 GHz
+                        BSSID 14                 : 7c:57:3c:be:5e:41
+                             Signal             : 32% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 15                 : 7c:57:3c:be:26:01
+                             Signal             : 26% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 16                 : a8:bd:27:f6:f4:f1
+                             Signal             : 22% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                        BSSID 17                 : 84:d4:7e:69:89:91
+                             Signal             : 18% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
+                    SSID 3 : SETUP
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 9e:2b:77:8e:45:c7
+                             Signal             : 80% \s
+                             Radio type         : 802.11b
+                             Band               : 2.4 GHz
+                    SSID 4 : rtec
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4e
+                             Signal             : 80% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 5 : DIRECT-15-HP M283 LaserJet
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : ce:5e:f8:5b:19:15
+                             Signal             : 60% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 6 : HP-Print-29-LaserJet 400 color
+                        Authentication          : Open
+                        Encryption              : None\s
+                        BSSID 1                 : 08:3e:8e:72:b3:29
+                             Signal             : 56% \s
+                             Radio type         : 802.11g
+                             Band               : 2.4 GHz
+                    SSID 7 : DIRECT-9C-HP DeskJet 4100 series
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:81:40:1b:a6:9d
+                             Signal             : 50% \s
+                             Radio type         : 802.11n
+                             Band               : 2.4 GHz
+                    SSID 8 : rtec_5G
+                        Authentication          : WPA2-Personal
+                        Encryption              : CCMP\s
+                        BSSID 1                 : 50:91:e3:40:3b:4d
+                             Signal             : 46% \s
+                             Radio type         : 802.11ac
+                             Band               : 5 GHz
             """;
         return parseStringToListOfJSON(wifiData);
     }
