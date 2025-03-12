@@ -4,19 +4,28 @@ import org.json.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class WriteJSONToKML {
 
-    public static void writeJSONToKML(List<JSONObject> jsonObjects, String filePath) {
+    public static void writeJSONToKML(List<JSONObject> jsonObjects, String fileName) {
         StringBuilder kmlBuilder = new StringBuilder();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateTime = sdf.format(new Date());
+        fileName = currentDateTime + "_" + fileName + ".kml";
 
         // Start KML structure
         kmlBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         kmlBuilder.append("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n");
         kmlBuilder.append("<Document>\n");
 
+        int counter = 0;
         for (JSONObject jsonObject : jsonObjects) {
-            if (jsonObject.has("latitude") && jsonObject.has("longitude")) {
+
+            if (jsonObject.has("latitude") && jsonObject.has("longitude") &&
+                    !jsonObject.getString("latitude").isEmpty() && !jsonObject.getString("longitude").isEmpty()) {
+
                 double latitude = convertToDecimal(jsonObject.getString("latitude"), jsonObject.getString("northSouth"));
                 double longitude = convertToDecimal(jsonObject.getString("longitude"), jsonObject.getString("eastWest"));
                 double altitude = jsonObject.optDouble("altitude", 0.0);
@@ -46,6 +55,8 @@ public class WriteJSONToKML {
                         .append("</coordinates>\n");
                 kmlBuilder.append("</Point>\n");
                 kmlBuilder.append("</Placemark>\n");
+
+                counter++;
             }
         }
 
@@ -54,25 +65,35 @@ public class WriteJSONToKML {
         kmlBuilder.append("</kml>\n");
 
         // Write to file
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write(kmlBuilder.toString());
-            System.out.println("KML file successfully created at: " + filePath);
-        } catch (IOException e) {
-            System.err.println("Error writing KML file: " + e.getMessage());
+        if (counter > 0) {
+            try (FileWriter writer = new FileWriter(fileName)) {
+                writer.write(kmlBuilder.toString());
+                System.out.println("KML file successfully created at: " + fileName);
+            } catch (IOException e) {
+                System.err.println("Error writing KML file: " + e.getMessage());
+            }
+        }
+        else {
+            System.out.println("KML file was not created: no geospatial data found.");
         }
     }
 
     // Converts "3244.8109" N/S format to decimal degrees needed for .kml file
     private static double convertToDecimal(String dms, String direction) {
-        double degrees = Double.parseDouble(dms.substring(0, dms.length() - 7));  // Extract degrees
-        double minutes = Double.parseDouble(dms.substring(dms.length() - 7));  // Extract minutes
-        double decimal = degrees + (minutes / 60.0);
-
-        // Apply negative for South or West
-        if ("S".equalsIgnoreCase(direction) || "W".equalsIgnoreCase(direction)) {
-            decimal = -decimal;
+        try {
+            double degrees = Double.parseDouble(dms.substring(0, dms.length() - 7));  // Extract degrees
+            double minutes = Double.parseDouble(dms.substring(dms.length() - 7));  // Extract minutes
+            double decimal = degrees + (minutes / 60.0);
+            // Apply negative for South or West
+            if ("S".equalsIgnoreCase(direction) || "W".equalsIgnoreCase(direction)) {
+                decimal = -decimal;
+            }
+            return decimal;
         }
-        return decimal;
+        catch (StringIndexOutOfBoundsException e) {
+            System.out.println("Error converting coordinate " + dms + " to decimal format: " + e);
+            return 0.0;
+        }
     }
 
     public static void main(String[] args) {
@@ -85,7 +106,7 @@ public class WriteJSONToKML {
         List<JSONObject> mergedJSONObjectList = wifiParser.parseStringToListOfJSON(); //using the parseStringToListOfJSON() method from class ParseWiFiDataWindows, generate the list of WiFi json objects from the sample data included in ParseWiFiDataWindows for testing purposes only
         MergeJSONData.mergeJSONObjects(mergedJSONObjectList, gpsParser.parseStringToListOfJSON(gpsData)); //add the gps data to each WiFi json object in mergedJSONObjectList, the return is not used in this case, but rather the variable mergedJSONObjectList, provided as the first argument since it is modified by the method
 
-        writeJSONToKML(mergedJSONObjectList, "output2.kml");
+        writeJSONToKML(mergedJSONObjectList, "output2");
 
     }
 
