@@ -21,11 +21,9 @@ public class ContinuousWiFiGPSScanWindows {
             try {
                 // Step 1: Perform WiFi scan
                 String wifiScanResult = SingleWiFiScanWindows.scan();  // Assume this method exists
-//                System.out.println(wifiScanResult);
 
                 // Step 2: Parse Wi-Fi scan result
                 List<JSONObject> wifiParsedResults = ParseWiFiDataWindows.parseStringToListOfJSON(wifiScanResult);  // Assume this method exists
-//                System.out.println(parsedResults);
 
                 // Step 3: Perform GPS scan
                 SingleGPSScanWindows gpsScanner = new SingleGPSScanWindows();
@@ -58,8 +56,8 @@ public class ContinuousWiFiGPSScanWindows {
 
     public static void main(String[] args) throws IOException {
         ContinuousWiFiGPSScanWindows contScan = new ContinuousWiFiGPSScanWindows();
-        List <JSONObject> jsonWiFiObjects = contScan.scan(1, 8);
-        WriteJSONToKML.writeJSONToKML(jsonWiFiObjects, "kmlOutput.kml");
+        List <JSONObject> jsonWiFiObjects = contScan.scan(1, 2);
+        WriteJSONToKML.writeJSONToKML(jsonWiFiObjects, "contScanOutput");
         WriteJSONToCSV.writeJsonListToCsv(jsonWiFiObjects, "csvOutput.csv");
         for (JSONObject data : jsonWiFiObjects) { //iterate through the JSON objects, printing each
             System.out.println(data.toString(4));
