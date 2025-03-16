@@ -2,6 +2,9 @@ package org.cs250.nan.backend.shell;
 
 import org.json.JSONObject;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ParseWiFiDataWindows {
@@ -78,6 +81,15 @@ public class ParseWiFiDataWindows {
                 currentMap.put("SSID", ssid); //add the previously collected values for ssid, auth, and encryption
                 currentMap.put("Authentication", auth);
                 currentMap.put("Encryption", encryp);
+
+                // Get the local time in "HHmmss.SSS" format
+                String timeFormatted = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss.SSS"));
+                currentMap.put("timeLocal", timeFormatted);
+
+                // Get the local date in "ddMMyy" format
+                String dateFormatted = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy"));
+                currentMap.put("dateLocal", dateFormatted);
+
             }
             else { //for all other lines, simple split them at the ":", remove whitespace and add to the map
                 String[] parts = lines[i].split(":");
