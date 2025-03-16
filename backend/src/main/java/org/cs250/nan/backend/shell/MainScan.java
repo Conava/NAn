@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,39 +25,46 @@ public class MainScan {
                 while (running.get()) {
                     if (scanner.nextLine().trim().isEmpty()) {
                         running.set(false);
+                        System.out.println("Concluding final scan and exiting...");
                     }
                 }
                 scanner.close();
             });
             inputThread.start();
         }
-
+        System.out.println("Beginning scan. End the scan by pressing the enter key.");
         while (running.get()) {
             try {
                 // Step 1: Perform WiFi scan
                 String wifiScanResult = SingleWiFiScanWindows.scan();
                 if (wifiScanResult == null) {
-                    System.out.println("Wi-Fi scan failed, exiting program.");
-                    System.exit(1);
+                    System.out.println("Wi-Fi scan returned an empty string; retrying (or press enter to quit).");
+                    continue;
                 }
 
                 // Step 2: Parse Wi-Fi scan result
                 List<JSONObject> wifiParsedResults = ParseWiFiDataWindows.parseStringToListOfJSON(wifiScanResult);
 
+                // Step 3: Perform GPS scan
                 if (gpsOn) {
-                    // Step 3: Perform GPS scan
                     SingleGPSScanWindows gpsScanner = new SingleGPSScanWindows();
                     String gpsScanResult = gpsScanner.getGPSDataIgnoreGPGSV();
 
-                    // Step 4: Parse GPS scan result
-                    ParseGPSData gpsData = new ParseGPSData();
-                    JSONObject gpsParsedResults = gpsData.parseStringToListOfJSON(gpsScanResult);
+                    if (!Objects.equals(gpsScanResult, "")) {
+                        // Step 4: Parse GPS scan result
+                        ParseGPSData gpsData = new ParseGPSData();
+                        JSONObject gpsParsedResults = gpsData.parseStringToListOfJSON(gpsScanResult);
 
-                    // Step 5: Merge the parsed results from the Wi-Fi and GPS scans
-                    List<JSONObject> mergedScanResult = MergeJSONData.mergeJSONObjects(wifiParsedResults, gpsParsedResults);
+                        // Step 5: Merge the parsed results from the Wi-Fi and GPS scans
+                        List<JSONObject> mergedScanResult = MergeJSONData.mergeJSONObjects(wifiParsedResults, gpsParsedResults);
 
-                    // Step 6: Add to collected results
-                    collectedScans.addAll(mergedScanResult);
+                        // Step 6: Add to collected results
+                        collectedScans.addAll(mergedScanResult);
+                    }
+                    else {
+                        System.out.println("GPS scan returned an empty string; retrying (or press enter to quit).");
+                        collectedScans.addAll(wifiParsedResults);
+                    }
                 }
                 else {
                     kmlOutput = false;
@@ -91,11 +99,11 @@ public class MainScan {
     }
 
     public static void main(String[] args) throws IOException {
-        List<JSONObject> results = scan(true, true, true, true, 1, "continuousWiFiScan", "continuousWiFiScan");
+        List<JSONObject> results = scan(true, true, true, false, 1, "continuousWiFiScan", "continuousWiFiScan");
 
 //        for (JSONObject data : results) { // Iterate through the JSON objects, printing each
 //            System.out.println(data.toString(4));
-//        }
 
+//        }
     }
 }
