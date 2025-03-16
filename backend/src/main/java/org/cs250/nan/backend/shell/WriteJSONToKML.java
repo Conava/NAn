@@ -23,8 +23,12 @@ public class WriteJSONToKML {
         int counter = 0;
         for (JSONObject jsonObject : jsonObjects) {
 
+
+
             if (jsonObject.has("latitude") && jsonObject.has("longitude") &&
-                    !jsonObject.getString("latitude").isEmpty() && !jsonObject.getString("longitude").isEmpty()) {
+                    !jsonObject.getString("latitude").isEmpty() && !jsonObject.getString("longitude").isEmpty() &&
+                    !jsonObject.getString("SSID").contains("<")) { // Ignore JSON objects that lack the required
+                    // geo data to plot or objects where SSID contains the reserved character "<", which cannot be escaped
 
                 double latitude = convertToDecimal(jsonObject.getString("latitude"), jsonObject.getString("northSouth"));
                 double longitude = convertToDecimal(jsonObject.getString("longitude"), jsonObject.getString("eastWest"));
@@ -39,7 +43,7 @@ public class WriteJSONToKML {
 
                 // Create Placemark
                 kmlBuilder.append("<Placemark>\n");
-                kmlBuilder.append("<name>").append(ssid).append("</name>\n");
+                kmlBuilder.append("<name>").append(escapeSpecialXMLChars(ssid)).append("</name>\n");
                 kmlBuilder.append("<description>\n");
                 kmlBuilder.append("Signal Strength: ").append(signal).append("\n");
                 kmlBuilder.append("Radio Type: ").append(radioType).append("\n");
@@ -94,6 +98,17 @@ public class WriteJSONToKML {
             System.out.println("Error converting coordinate " + dms + " to decimal format: " + e);
             return 0.0;
         }
+    }
+
+    // Method to handle SSIDs with reserved XML characters: & " ' >
+    // NOTE: < is also a reserved XML character however, escaping it still does not allow Google Earth to use it.
+    public static String escapeSpecialXMLChars(String ssid) {
+        if (ssid == null) {
+            return null;
+        }
+
+        // Use CDATA if the string contains characters like <, >, &, etc.
+        return "<![CDATA[" + ssid + "]]>";
     }
 
     public static void main(String[] args) {
