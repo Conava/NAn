@@ -4,22 +4,28 @@ import org.json.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 public class WriteJSONToCSV {
-    public static void writeJsonListToCsv(List<JSONObject> jsonList, String filePath) throws IOException {
+    public static void writeJsonListToCsv(List<JSONObject> jsonList, String fileName) throws IOException {
         if (jsonList.isEmpty()) {
             System.out.println("Empty JSON list, nothing to write.");
             return;
         }
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateTime = sdf.format(new Date());
+        fileName = currentDateTime + "_" + fileName + ".csv";
+
         // Extract headers (keys) from the first JSON object
         Set<String> headers = jsonList.get(0).keySet();
 
         // Open CSV file writer
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (FileWriter writer = new FileWriter(fileName)) {
             // Write headers
             writer.append(String.join(",", headers));
             writer.append("\n");
@@ -34,7 +40,7 @@ public class WriteJSONToCSV {
                 writer.append("\n");
             }
 
-            System.out.println("CSV file created successfully: " + filePath);
+            System.out.println("CSV file created successfully: " + fileName);
         }
     }
 
