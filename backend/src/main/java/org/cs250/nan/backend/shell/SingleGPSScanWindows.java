@@ -120,7 +120,7 @@ public class SingleGPSScanWindows {
 
         // Open the port
         if (serialPort.openPort()) {
-            System.out.println("Port opened successfully.");
+            System.out.println("GPS port opened successfully.");
             StringBuilder sentenceBuilder = new StringBuilder();
 
             // Read data from the serial port
@@ -166,7 +166,7 @@ public class SingleGPSScanWindows {
                 output.append(sentence).append("\n");
             }
         } else {
-            System.out.println("Failed to open port.");
+            System.out.println("Failed to open GPS port.");
             return "";
         }
         // Close the port
