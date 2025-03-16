@@ -13,22 +13,23 @@ public class MainScan {
     public static List<JSONObject> scan(boolean continuousScan, boolean gpsOn, boolean kmlOutput, boolean csvOutput, int scanInterval, String kmlFileName, String csvFileName) throws IOException {
         List<JSONObject> collectedScans = new ArrayList<>();
         int counter = 0;
-//        long startTime = System.currentTimeMillis();
-//        long endTime = startTime + (totalTimeSeconds * 1000L);
 
         running.set(true);
 
         // This Thread allows the user to press the enter key to end a continuous scan
-        Thread inputThread = new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            while (running.get()) {
-                if (scanner.nextLine().trim().isEmpty()) {
-                    running.set(false);
+        Thread inputThread = null;
+        if (continuousScan) {
+            inputThread = new Thread(() -> {
+                Scanner scanner = new Scanner(System.in);
+                while (running.get()) {
+                    if (scanner.nextLine().trim().isEmpty()) {
+                        running.set(false);
+                    }
                 }
-            }
-            scanner.close();
-        });
-        inputThread.start();
+                scanner.close();
+            });
+            inputThread.start();
+        }
 
         while (running.get()) {
             try {
@@ -61,7 +62,6 @@ public class MainScan {
                     kmlOutput = false;
                     collectedScans.addAll(wifiParsedResults);
                 }
-//                System.out.println(collectedScans);
                 counter++;
                 System.out.println("Scan(s) completed: " + counter + ".");
 
@@ -86,11 +86,12 @@ public class MainScan {
             WriteJSONToCSV.writeJsonListToCsv(collectedScans, csvFileName);
         }
 
+        running.set(false);
         return collectedScans;
     }
 
     public static void main(String[] args) throws IOException {
-        List<JSONObject> results = scan(false, true, true, true, 1, "continuousWiFiScan", "continuousWiFiScan");
+        List<JSONObject> results = scan(true, true, true, true, 1, "continuousWiFiScan", "continuousWiFiScan");
 
 //        for (JSONObject data : results) { // Iterate through the JSON objects, printing each
 //            System.out.println(data.toString(4));
