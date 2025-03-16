@@ -8,7 +8,7 @@ public class ParseGPSData {
 
     private final Map<String, String[]> dataLabels; // these labels are the keys for the ksy-value pairs of the GPS data
     private static final String[] gpggaSentenceLabels = { //"fix data", arranged in order as reported by NMEA sentences
-            "utcTime", "latitude", "northSouth", "longitude", "eastWest", "positionFix",
+            "timeUTC", "latitude", "northSouth", "longitude", "eastWest", "positionFix",
             "satelliteCount", "hdop", "altitude", "altitudeUnits", "geoIdSep", "sepUnits",
             "dgpsAge", "dgpsStationId"
     };
@@ -18,8 +18,8 @@ public class ParseGPSData {
             "sat11", "sat12", "pdop", "hdop", "vdop"
     };
     private static final String[] gprmcSentenceLabels = { //"position and time data", arranged in order as reported by NMEA sentences
-            "utcTime", "status", "latitude", "northSouth", "longitude", "eastWest",
-            "spdOverGrnd", "courseOverGrnd", "date", "magVariation", "magDirection", "modeIndicator"
+            "timeUTC", "status", "latitude", "northSouth", "longitude", "eastWest",
+            "spdOverGrnd", "courseOverGrnd", "dateUTC", "magVariation", "magDirection", "modeIndicator"
     };
     public ParseGPSData() { //constructor to initialize data labels for use in creating the Map holding the GPS data
         dataLabels = new HashMap<>();
