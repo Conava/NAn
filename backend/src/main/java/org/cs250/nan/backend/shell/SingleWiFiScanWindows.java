@@ -34,7 +34,10 @@ public class SingleWiFiScanWindows {
             while ((line = reader.readLine()) != null) {//while there are still lines to be read from the shell
                 output.append(line).append("\n"); // Append each line to the output/stringbuilder object
             }
-
+            if (output.toString().isEmpty()) {
+                System.out.println("No information returned from the Wi-Fi interface device; ensure Wi-Fi is enabled.");
+                return null;
+            }
             return output.toString(); //convert the stringbuilder object to a String
 
         } catch (IOException e) { //simple exception handling
