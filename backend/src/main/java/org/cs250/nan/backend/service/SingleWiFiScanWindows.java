@@ -1,4 +1,4 @@
-package org.cs250.nan.backend.shell;
+package org.cs250.nan.backend.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
