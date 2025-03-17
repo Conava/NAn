@@ -1,6 +1,5 @@
 package org.cs250.nan.backend.shell;
 
-import org.cs250.nan.backend.BackendApplication;
 import org.cs250.nan.backend.config.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
