@@ -1,169 +1,138 @@
 package org.cs250.nan.backend.shell;
 
 import org.cs250.nan.backend.config.Settings;
+import org.cs250.nan.backend.service.ScanManager;
+import org.cs250.nan.backend.service.MonitoringManager;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+/**
+ * The ShellCommands class provides shell-accessible operations to control monitoring mode,
+ * update monitoring settings, and run single scans. These commands allow runtime interaction
+ * with the monitoring feature using the current settings.
+ */
 @ShellComponent
 public class ShellCommands {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShellCommands.class);
-    private final Settings settings;
-    private final ApplicationContext context;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShellCommands.class);
 
+    private final ScanManager scanManager;
+    private final MonitoringManager monitoringManager;
+    private final Settings settings;
+
+    /**
+     * Constructs the ShellCommands with injected services.
+     *
+     * @param scanManager       the manager responsible for running scans.
+     * @param monitoringManager the manager responsible for continuous monitoring scans.
+     * @param settings          the configuration settings for monitoring.
+     */
     @Autowired
-    public ShellCommands(ApplicationContext context, Settings settings) {
-        this.context = context;
+    public ShellCommands(ScanManager scanManager, MonitoringManager monitoringManager, Settings settings) {
+        this.scanManager = scanManager;
+        this.monitoringManager = monitoringManager;
         this.settings = settings;
     }
 
-    @ShellMethod(value = "Print a greeting message", key = "hello")
-    public String hello(@ShellOption(defaultValue = "User") String name) {
-        logger.debug("Entering hello command with parameter: {}", name);
-        String greeting = String.format("Hello, %s!", name);
-        logger.info("Greeting generated: {}", greeting);
-        logger.debug("Exiting hello command");
-        return greeting;
+    /**
+     * Starts the monitoring mode. Continuous scans will begin using the current monitoring settings.
+     *
+     * @return a confirmation message indicating monitoring mode is enabled.
+     */
+    @ShellMethod(value = "Start monitoring mode", key = "startMonitoring")
+    public String startMonitoring() {
+        monitoringManager.startMonitoring();
+        LOGGER.info("Monitoring mode enabled via shell.");
+        return "Monitoring mode enabled.";
     }
 
-    @ShellMethod(value = "Perform a one time scan", key = "scan")
-    public String scan() {
-        logger.debug("Entering scan command");
-        String result = "Scan initiated";
-        logger.info("Scan command executed");
-        logger.debug("Exiting scan command");
-        return result;
+    /**
+     * Stops the monitoring mode.
+     *
+     * @return a confirmation message indicating monitoring mode is disabled.
+     */
+    @ShellMethod(value = "Stop monitoring mode", key = "stopMonitoring")
+    public String stopMonitoring() {
+        monitoringManager.stopMonitoring();
+        LOGGER.info("Monitoring mode disabled via shell.");
+        return "Monitoring mode disabled.";
     }
 
-    @ShellMethod(value = "Start continuous scan monitoring", key = "monitor")
-    public String monitor() {
-        logger.debug("Entering monitor command");
-        String result = "Continuous scan monitoring started";
-        logger.info("Monitor command executed");
-        logger.debug("Exiting monitor command");
-        return result;
+    /**
+     * Updates the monitoring settings based on provided parameters and restarts monitoring if active.
+     *
+     * @param scanInterval the new scan interval (in seconds) for monitoring.
+     * @param gpsOn        flag indicating whether GPS should be enabled.
+     * @param kmlOutput    flag indicating whether KML output is enabled.
+     * @param csvOutput    flag indicating whether CSV output is enabled.
+     * @param kmlFileName  the new file name for KML output.
+     * @param csvFileName  the new file name for CSV output.
+     * @return a confirmation message indicating that monitoring settings have been updated.
+     */
+    @ShellMethod(value = "Update monitoring settings", key = "updateMonitoring")
+    public String updateMonitoring(@ShellOption(defaultValue = "5") int scanInterval,
+                                   @ShellOption(defaultValue = "true") boolean gpsOn,
+                                   @ShellOption(defaultValue = "true") boolean kmlOutput,
+                                   @ShellOption(defaultValue = "false") boolean csvOutput,
+                                   @ShellOption(defaultValue = "monitorKML") String kmlFileName,
+                                   @ShellOption(defaultValue = "monitorCSV") String csvFileName) {
+        settings.setMonitorScanInterval(scanInterval);
+        settings.setMonitorGpsOn(gpsOn);
+        settings.setMonitorKmlOutput(kmlOutput);
+        settings.setMonitorCsvOutput(csvOutput);
+        settings.setMonitorKmlFileName(kmlFileName);
+        settings.setMonitorCsvFileName(csvFileName);
+        settings.saveSettings();
+        // Restart monitoring if it is already active.
+        monitoringManager.stopMonitoring();
+        monitoringManager.startMonitoring();
+        LOGGER.info("Monitoring settings updated via shell.");
+        return "Monitoring settings updated.";
     }
 
-    @ShellMethod(value = "Open API", key = "openApi")
-    public String openApi() {
-        logger.debug("Entering openApi command");
-        String result = "API opened";
-        logger.info("Open API command executed");
-        logger.debug("Exiting openApi command");
-        return result;
+    @ShellMethod(value = "Reset all settings to default", key = "resetSettings")
+    public String resetSettings() {
+        settings.resetToDefaults();
+        LOGGER.info("Settings have been reset to default via shell.");
+        return "Settings have been reset to default.";
     }
 
-    @ShellMethod(value = "Close API", key = "closeApi")
-    public String closeApi() {
-        logger.debug("Entering closeApi command");
-        String result = "API closed";
-        logger.info("Close API command executed");
-        logger.debug("Exiting closeApi command");
-        return result;
-    }
-
-    @ShellMethod(value = "View the latest scan data", key = "latestScan")
-    public String latestScan() {
-        logger.debug("Entering latestScan command");
-        String result = "Latest scan data displayed";
-        logger.info("LatestScan command executed");
-        logger.debug("Exiting latestScan command");
-        return result;
-    }
-
-    @ShellMethod(value = "Open web interface", key = "openWeb")
-    public String openWeb() {
-        logger.debug("Entering openWeb command");
-        String result = "Web interface opened";
-        logger.info("openWeb command executed");
-        logger.debug("Exiting openWeb command");
-        return result;
-    }
-
-    @ShellMethod(value = "Export data", key = "export")
-    public String export() {
-        logger.debug("Entering export command");
-        String result = "Data export initiated";
-        logger.info("Export command executed");
-        logger.debug("Exiting export command");
-        return result;
-    }
-
-    @ShellMethod(value = "Restart the application", key = "restart")
-    public String restart() {
-        logger.debug("Entering restart command");
-        String result = "Application restarting...";
-        logger.info("Restart command executed");
-        logger.debug("Exiting restart command");
-        return result;
-    }
-
-    @ShellMethod(value = "Display or update settings", key = "settings")
-    public String settings(@ShellOption(defaultValue = "") String key, @ShellOption(defaultValue = "") String value) {
-        logger.debug("Entering settings command; key: {}, value: {}", key, value);
-        String result;
-        if (key.isEmpty()) {
-            result = String.format("dataStorage: %s\ndefaultUseOfGps: %s\nkeepHistory: %s\nactivateGui: %s",
-                    settings.getDataStorage(), settings.isDefaultUseOfGps(),
-                    settings.isKeepHistory(), settings.isActivateGui());
-        } else {
-            switch (key) {
-                case "dataStorage":
-                    settings.setDataStorage(value);
-                    break;
-                case "defaultUseOfGps":
-                    settings.setDefaultUseOfGps(Boolean.parseBoolean(value));
-                    break;
-                case "keepHistory":
-                    settings.setKeepHistory(Boolean.parseBoolean(value));
-                    break;
-                case "activateGui":
-                    settings.setActivateGui(Boolean.parseBoolean(value));
-                    break;
-                default:
-                    logger.warn("Invalid setting key attempted: {}", key);
-                    return "Invalid setting key.";
-            }
-            settings.saveSettings();
-            result = "Setting updated.";
+    /**
+     * Runs a single scan using the specified parameters.
+     * This operation can execute concurrently with an active monitoring mode.
+     *
+     * @param gpsOn        flag indicating whether GPS should be enabled.
+     * @param kmlOutput    flag indicating whether KML output is enabled.
+     * @param csvOutput    flag indicating whether CSV output is enabled.
+     * @param scanInterval the scan interval, though for a single scan this value is used only as a parameter.
+     * @param kmlFileName  the file name for KML output.
+     * @param csvFileName  the file name for CSV output.
+     * @return a message indicating the number of results from the single scan.
+     */
+    @ShellMethod(value = "Run single scan", key = "singleScan")
+    public String singleScan(@ShellOption(defaultValue = ShellOption.NULL) Boolean gpsOn,
+                             @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
+                             @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
+                             @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
+                             @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
+                             @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
+        Future<List<JSONObject>> futureResults = scanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
+        try {
+            List<JSONObject> results = futureResults.get();
+            LOGGER.info("Single scan completed with {} result(s).", results != null ? results.size() : 0);
+            return "Single scan completed with " + (results != null ? results.size() : 0) + " result(s).";
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("Error during single scan: {}", e.getMessage(), e);
+            return "An error occurred during single scan: " + e.getMessage();
         }
-        logger.info("Exiting settings command with result: {}", result);
-        return result;
-    }
-
-    @ShellMethod(value = "Help for settings command", key = "helpSettings")
-    public String helpSettings() {
-        logger.debug("Entering helpSettings command");
-        String helpMessage = "Settings command usage:\n" +
-                "settings - Display all settings\n" +
-                "settings <key> <value> - Update a setting\n" +
-                "Available keys:\n" +
-                "dataStorage - Path to data storage directory\n" +
-                "defaultUseOfGps - true/false to enable/disable GPS by default\n" +
-                "keepHistory - true/false to keep or delete data from the last run\n" +
-                "activateGui - true/false to activate or deactivate the GUI by default";
-        logger.info("HelpSettings command executed");
-        logger.debug("Exiting helpSettings command");
-        return helpMessage;
-    }
-
-    @ShellMethod(value = "Exit the application", key = "exit")
-    public void exit() {
-        logger.debug("Entering exit command");
-        SpringApplication.exit(context, () -> 0);
-        logger.info("Exit command executed");
-        logger.debug("Exiting exit command");
-        System.exit(0);
-    }
-
-    @ShellMethod(value= "Exit the application", key = "quit")
-    public void quit() {
-        exit();
     }
 }

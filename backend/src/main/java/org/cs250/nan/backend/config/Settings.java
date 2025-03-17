@@ -24,6 +24,12 @@ import org.springframework.stereotype.Component;
  *   <li><b>keepHistory</b> - Flag indicating whether history is kept</li>
  *   <li><b>activateGui</b> - Flag indicating whether the GUI is activated</li>
  *   <li><b>logFile</b> - Path to the log file</li>
+ *   <li><b>monitor.scanInterval</b> - Default scan interval (in seconds) for monitoring mode</li>
+ *   <li><b>monitor.gpsOn</b> - Flag indicating whether GPS is enabled for monitoring mode</li>
+ *   <li><b>monitor.kmlOutput</b> - Flag indicating whether KML output is enabled for monitoring</li>
+ *   <li><b>monitor.csvOutput</b> - Flag indicating whether CSV output is enabled for monitoring</li>
+ *   <li><b>monitor.kmlFileName</b> - Default file name for KML output in monitoring mode</li>
+ *   <li><b>monitor.csvFileName</b> - Default file name for CSV output in monitoring mode</li>
  * </ul>
  * </p>
  *
@@ -38,22 +44,24 @@ import org.springframework.stereotype.Component;
  * String dataStoragePath = settings.getDataStorage();
  * settings.setDataStorage("/new/data/storage");
  * settings.saveSettings();
+ *
+ * // Retrieve monitor settings:
+ * int interval = settings.getMonitorScanInterval();
+ * boolean monitorGps = settings.isMonitorGpsOn();
  * }
  * </pre>
  *
  * <p>This class is annotated with {@code @Component} so that it is automatically detected and registered as a
  * Spring Bean.</p>
  *
+ * @author Marlon
+ * @version 1.1
  * @see java.nio.file.Path
  * @see java.util.Properties
  * @see org.slf4j.Logger
  * @see org.slf4j.LoggerFactory
  * @see org.springframework.stereotype.Component
- *
- * @author Marlon
- * @version 1.0
  */
-
 @Component
 public class Settings {
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
@@ -101,12 +109,21 @@ public class Settings {
         }
     }
 
+    /**
+     * Sets default properties for all configuration settings including monitoring settings.
+     */
     private void setDefaultProperties() {
         properties.setProperty("dataStorage", "/default/data/storage");
         properties.setProperty("defaultUseOfGps", "true");
         properties.setProperty("keepHistory", "true");
         properties.setProperty("activateGui", "true");
         properties.setProperty("logFile", dirPath.resolve("log.txt").toString());
+        properties.setProperty("monitor.scanInterval", "5");
+        properties.setProperty("monitor.gpsOn", "true");
+        properties.setProperty("monitor.kmlOutput", "true");
+        properties.setProperty("monitor.csvOutput", "false");
+        properties.setProperty("monitor.kmlFileName", "monitorKML");
+        properties.setProperty("monitor.csvFileName", "monitorCSV");
     }
 
     /**
@@ -203,5 +220,127 @@ public class Settings {
      */
     public String getLogFilePath() {
         return properties.getProperty("logFile");
+    }
+
+    // Monitoring-related getters and setters:
+
+    /**
+     * Retrieves the default scan interval for monitoring mode.
+     *
+     * @return the monitor scan interval in seconds.
+     */
+    public int getMonitorScanInterval() {
+        return Integer.parseInt(properties.getProperty("monitor.scanInterval"));
+    }
+
+    /**
+     * Sets the default scan interval for monitoring mode.
+     *
+     * @param scanInterval the scan interval in seconds.
+     */
+    public synchronized void setMonitorScanInterval(int scanInterval) {
+        properties.setProperty("monitor.scanInterval", Integer.toString(scanInterval));
+    }
+
+    /**
+     * Checks if GPS is enabled for monitoring mode.
+     *
+     * @return true if GPS is enabled for monitoring; false otherwise.
+     */
+    public boolean isMonitorGpsOn() {
+        return Boolean.parseBoolean(properties.getProperty("monitor.gpsOn"));
+    }
+
+    /**
+     * Sets whether GPS should be enabled for monitoring mode.
+     *
+     * @param gpsOn true to enable GPS in monitoring; false to disable.
+     */
+    public synchronized void setMonitorGpsOn(boolean gpsOn) {
+        properties.setProperty("monitor.gpsOn", Boolean.toString(gpsOn));
+    }
+
+    /**
+     * Checks if KML output is enabled for monitoring mode.
+     *
+     * @return true if KML output is enabled; false otherwise.
+     */
+    public boolean isMonitorKmlOutput() {
+        return Boolean.parseBoolean(properties.getProperty("monitor.kmlOutput"));
+    }
+
+    /**
+     * Sets whether KML output should be enabled for monitoring mode.
+     *
+     * @param kmlOutput true to enable KML output; false to disable.
+     */
+    public synchronized void setMonitorKmlOutput(boolean kmlOutput) {
+        properties.setProperty("monitor.kmlOutput", Boolean.toString(kmlOutput));
+    }
+
+    /**
+     * Checks if CSV output is enabled for monitoring mode.
+     *
+     * @return true if CSV output is enabled; false otherwise.
+     */
+    public boolean isMonitorCsvOutput() {
+        return Boolean.parseBoolean(properties.getProperty("monitor.csvOutput"));
+    }
+
+    /**
+     * Sets whether CSV output should be enabled for monitoring mode.
+     *
+     * @param csvOutput true to enable CSV output; false to disable.
+     */
+    public synchronized void setMonitorCsvOutput(boolean csvOutput) {
+        properties.setProperty("monitor.csvOutput", Boolean.toString(csvOutput));
+    }
+
+    /**
+     * Retrieves the default file name for KML output in monitoring mode.
+     *
+     * @return the KML file name as a String.
+     */
+    public String getMonitorKmlFileName() {
+        return properties.getProperty("monitor.kmlFileName");
+    }
+
+    /**
+     * Sets the default file name for KML output in monitoring mode.
+     *
+     * @param kmlFileName the new KML file name.
+     */
+    public synchronized void setMonitorKmlFileName(String kmlFileName) {
+        properties.setProperty("monitor.kmlFileName", kmlFileName);
+    }
+
+    /**
+     * Retrieves the default file name for CSV output in monitoring mode.
+     *
+     * @return the CSV file name as a String.
+     */
+    public String getMonitorCsvFileName() {
+        return properties.getProperty("monitor.csvFileName");
+    }
+
+    /**
+     * Sets the default file name for CSV output in monitoring mode.
+     *
+     * @param csvFileName the new CSV file name.
+     */
+    public synchronized void setMonitorCsvFileName(String csvFileName) {
+        properties.setProperty("monitor.csvFileName", csvFileName);
+    }
+
+    /**
+     * Resets all settings to their default values and saves them to the configuration file.
+     * <p>
+     * This method is synchronized to ensure thread safety during the reset operation.
+     * </p>
+     */
+    public synchronized void resetToDefaults() {
+        setDefaultProperties();
+        saveSettings();
+        LOGGER.info("Settings reset to default.");
     }
 }
