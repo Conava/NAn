@@ -1,9 +1,10 @@
-package org.cs250.nan.backend.service;
+package org.cs250.nan.backend.toBeDeprecated;
 
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+//todo: Merge logic into one class in the parser package, then delete this class.
 public class ParseGPSData {
 
     private final Map<String, String[]> dataLabels; // these labels are the keys for the ksy-value pairs of the GPS data

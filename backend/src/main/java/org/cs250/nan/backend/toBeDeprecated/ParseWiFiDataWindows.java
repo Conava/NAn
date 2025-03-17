@@ -1,4 +1,4 @@
-package org.cs250.nan.backend.service;
+package org.cs250.nan.backend.toBeDeprecated;
 
 import org.json.JSONObject;
 
@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+//todo: Merge logic into one class in the parser package, then delete this class.
 public class ParseWiFiDataWindows {
 //this class takes in the string output from SingleWiFiScanWindows and converts it into JSON format
 

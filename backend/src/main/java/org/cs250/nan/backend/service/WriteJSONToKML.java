@@ -1,5 +1,7 @@
 package org.cs250.nan.backend.service;
 
+import org.cs250.nan.backend.toBeDeprecated.ParseGPSData;
+import org.cs250.nan.backend.toBeDeprecated.ParseWiFiDataWindows;
 import org.json.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;

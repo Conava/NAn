@@ -1,5 +1,6 @@
 package org.cs250.nan.backend.service;
 
+import org.cs250.nan.backend.scanner.Scanner;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class ScanService {
     @Async
     public CompletableFuture<List<JSONObject>> runScanAsync(boolean gpsOn, boolean kmlOutput, boolean csvOutput, int scanInterval, String kmlFileName, String csvFileName) {
         try {
-            List<JSONObject> results = MainScan.scan(false, gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
+            List<JSONObject> results = Scanner.scan(gpsOn, kmlOutput, csvOutput, kmlFileName, csvFileName);
             return CompletableFuture.completedFuture(results);
         } catch (IOException e) {
             // Handle exception as needed and return a completed future with a null value

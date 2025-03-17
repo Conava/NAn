@@ -1,7 +1,7 @@
 package org.cs250.nan.backend.shell;
 
 import org.cs250.nan.backend.config.Settings;
-import org.cs250.nan.backend.service.ScanManager;
+import org.cs250.nan.backend.service.singleScanManager;
 import org.cs250.nan.backend.service.MonitoringManager;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -25,20 +25,20 @@ public class ShellCommands {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShellCommands.class);
 
-    private final ScanManager scanManager;
+    private final singleScanManager singleScanManager;
     private final MonitoringManager monitoringManager;
     private final Settings settings;
 
     /**
      * Constructs the ShellCommands with injected services.
      *
-     * @param scanManager       the manager responsible for running scans.
+     * @param singleScanManager       the manager responsible for running scans.
      * @param monitoringManager the manager responsible for continuous monitoring scans.
      * @param settings          the configuration settings for monitoring.
      */
     @Autowired
-    public ShellCommands(ScanManager scanManager, MonitoringManager monitoringManager, Settings settings) {
-        this.scanManager = scanManager;
+    public ShellCommands(singleScanManager singleScanManager, MonitoringManager monitoringManager, Settings settings) {
+        this.singleScanManager = singleScanManager;
         this.monitoringManager = monitoringManager;
         this.settings = settings;
     }
@@ -125,7 +125,7 @@ public class ShellCommands {
                              @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
                              @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
-        Future<List<JSONObject>> futureResults = scanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
+        Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
         try {
             List<JSONObject> results = futureResults.get();
             LOGGER.info("Single scan completed with {} result(s).", results != null ? results.size() : 0);

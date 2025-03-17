@@ -1,5 +1,6 @@
-package org.cs250.nan.backend.service;
+package org.cs250.nan.backend.toBeDeprecated;
 
+import org.cs250.nan.backend.service.*;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+//todo: Merge logic into one class in the scanner package, then delete this class.
 public class ContinuousWiFiGPSScanWindows {
     private final AtomicBoolean running = new AtomicBoolean(false);
 

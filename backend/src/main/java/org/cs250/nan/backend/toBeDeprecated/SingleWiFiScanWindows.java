@@ -1,9 +1,10 @@
-package org.cs250.nan.backend.service;
+package org.cs250.nan.backend.toBeDeprecated;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+//todo: Merge logic into one class in the scanner package, then delete this class.
 public class SingleWiFiScanWindows {
     //first method: accepts a string parameter identifying which WiFi interface to use for the scan; must be typed exactly as it appears to the OS,
     // likely need another class or method to retrieve that string (can be done easily)

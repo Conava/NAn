@@ -1,10 +1,11 @@
-package org.cs250.nan.backend.service;
+package org.cs250.nan.backend.toBeDeprecated;
 
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
+//todo: Merge logic into one class in the scanner package, then delete this class.
 public class SingleGPSScanWindows {
     //this class reads the constant stream of data coming in from the GPS device; this data is broken up into "NMEA sentences"
     //the methods collect those sentences into a single string and returns its; the return is to be used as the argument for
@@ -60,19 +61,15 @@ public class SingleGPSScanWindows {
                                     //a key corresponding to the sentence type; if the key exists, the data is updated
                                     if (completeSentence.startsWith("$GPGGA")) {
                                         gpsSentences.put("GPGGA", completeSentence);
-                                    }
-                                    else if (completeSentence.startsWith("$GPGSA")) {
+                                    } else if (completeSentence.startsWith("$GPGSA")) {
                                         gpsSentences.put("GPGSA", completeSentence);
-                                    }
-                                    else if (completeSentence.startsWith("$GPRMC")) {
+                                    } else if (completeSentence.startsWith("$GPRMC")) {
                                         gpsSentences.put("GPRMC", completeSentence);
-                                    }
-                                    else if (completeSentence.startsWith("$GPGSV")) {
+                                    } else if (completeSentence.startsWith("$GPGSV")) {
                                         gpsSentences.put("GPGSV", completeSentence);
                                     }
                                     sentenceBuilder.setLength(0); // Clear the builder for the next sentence
-                                }
-                                else { //if the sentence is the first sentence read, it is likely incomplete
+                                } else { //if the sentence is the first sentence read, it is likely incomplete
                                     firstSentenceDiscarded = true; //update the bool flag variable
                                     sentenceBuilder.setLength(0); //discard the incomplete NMEA sentence
                                 }
@@ -141,16 +138,13 @@ public class SingleGPSScanWindows {
                                     String completeSentence = sentenceBuilder.toString().trim();
                                     if (completeSentence.startsWith("$GPGGA")) {
                                         gpsSentences.put("GPGGA", completeSentence);
-                                    }
-                                    else if (completeSentence.startsWith("$GPGSA")) {
+                                    } else if (completeSentence.startsWith("$GPGSA")) {
                                         gpsSentences.put("GPGSA", completeSentence);
-                                    }
-                                    else if (completeSentence.startsWith("$GPRMC")) {
+                                    } else if (completeSentence.startsWith("$GPRMC")) {
                                         gpsSentences.put("GPRMC", completeSentence);
                                     }
                                     sentenceBuilder.setLength(0); // Clear the builder for the next sentence
-                                }
-                                else {
+                                } else {
                                     firstSentenceDiscarded = true;
                                     sentenceBuilder.setLength(0);
                                 }
