@@ -12,12 +12,12 @@ import java.util.Objects;
 @Service
 public class singleScanManager {
 
-    private final ScanService singleScanManager;
+    private final ScanService scanService;
     private final Settings settings;
 
     @Autowired
-    public singleScanManager(ScanService singleScanManager, Settings settings) {
-        this.singleScanManager = singleScanManager;
+    public singleScanManager(ScanService scanService, Settings settings) {
+        this.scanService = scanService;
         this.settings = settings;
     }
 
@@ -47,7 +47,7 @@ public class singleScanManager {
         String effectiveKmlFileName = Objects.nonNull(kmlFileName) ? kmlFileName : settings.getMonitorKmlFileName();
         String effectiveCsvFileName = Objects.nonNull(csvFileName) ? csvFileName : settings.getMonitorCsvFileName();
 
-        return singleScanManager.runScanAsync(effectiveGpsOn, effectiveKmlOutput, effectiveCsvOutput,
+        return scanService.runScanAsync(effectiveGpsOn, effectiveKmlOutput, effectiveCsvOutput,
                 effectiveScanInterval, effectiveKmlFileName, effectiveCsvFileName);
     }
 }
