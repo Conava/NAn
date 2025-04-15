@@ -34,7 +34,7 @@ public class FromFileSaveToMongoDB {
         return jsonObjects;
     }
 
-    public static void SaveToMongoDB(String filePath) {
+    public static void fromFileSaveToMongoDB(String filePath) {
 
         // If connected to MongoDB, write Each JSON object from the single scan to MongoDB
         MongoConnectionChecker checker = SpringContext.getBean(MongoConnectionChecker.class);
