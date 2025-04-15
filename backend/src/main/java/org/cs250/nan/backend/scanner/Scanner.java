@@ -3,11 +3,12 @@ package org.cs250.nan.backend.scanner;
 import org.cs250.nan.backend.parser.GPSDataParser;
 import org.cs250.nan.backend.parser.WiFiDataParser;
 import org.cs250.nan.backend.service.MergeJSONData;
+import org.cs250.nan.backend.service.WriteJSONfile;
 import org.cs250.nan.backend.service.WriteJSONToCSV;
 import org.cs250.nan.backend.service.WriteJSONToKML;
 import org.cs250.nan.backend.database.SaveToMongoDB;
 import org.cs250.nan.backend.database.SpringContext;
-import org.cs250.nan.backend.service.WriteJSONfile;
+import org.cs250.nan.backend.database.MongoConnectionChecker;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -96,11 +97,15 @@ public class Scanner {
             collectedScans.addAll(wifiParsedResults);
         }
 
-        // Write Each JSON object from the single scan to MongoDB
-        SaveToMongoDB mongoSaver = SpringContext.getBean(SaveToMongoDB.class);
+        // If connected to MongoDB, write Each JSON object from the single scan to MongoDB
+        MongoConnectionChecker checker = SpringContext.getBean(MongoConnectionChecker.class);
+        boolean mongoOk = checker.isConnected();
 
-        for (JSONObject scan : collectedScans) {
-            mongoSaver.insertJSONObject(scan);
+        if (mongoOk) {
+            SaveToMongoDB mongoSaver = SpringContext.getBean(SaveToMongoDB.class);
+            for (JSONObject scan : collectedScans) {
+                mongoSaver.insertJSONObject(scan);
+            }
         }
 
         // Write the results to a JSON file
