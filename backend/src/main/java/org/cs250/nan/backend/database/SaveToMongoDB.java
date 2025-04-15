@@ -23,7 +23,7 @@ public class SaveToMongoDB {
             doc.put("_id", new ObjectId());
         }
 
-        mongoTemplate.getCollection("all_data").insertOne(doc);
+        mongoTemplate.getCollection("all_data").insertOne(doc); // collection name currently hard-coded, add a setting later to allow user to specify and pass as a parameter
 
         System.out.println("Inserted document with _id: " + doc.get("_id"));
     }
