@@ -13,6 +13,11 @@ public class WriteJSONfile {
 
     public static void writeJSONfile(List<JSONObject> collectedScans, String fileName) {
 
+        if (collectedScans.isEmpty()) {
+            System.out.println("Empty JSON list, nothing to write.");
+            return;
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateTime = sdf.format(new Date());
         fileName = currentDateTime + "_" + fileName + ".csv";
