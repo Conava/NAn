@@ -59,6 +59,7 @@ public class MonitoringManager {
                         settings.isMonitorKmlOutput(),
                         settings.isMonitorCsvOutput(),
                         interval,
+                        settings.getMonitorJSONFileName(),
                         settings.getMonitorKmlFileName(),
                         settings.getMonitorCsvFileName());
                 List<JSONObject> results = futureResults.get();
