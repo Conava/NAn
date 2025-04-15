@@ -122,6 +122,7 @@ public class Settings {
         properties.setProperty("monitor.gpsOn", "true");
         properties.setProperty("monitor.kmlOutput", "true");
         properties.setProperty("monitor.csvOutput", "false");
+        properties.setProperty("monitor.JSONFileName", "monitorJSON");
         properties.setProperty("monitor.kmlFileName", "monitorKML");
         properties.setProperty("monitor.csvFileName", "monitorCSV");
     }
@@ -294,6 +295,24 @@ public class Settings {
      */
     public synchronized void setMonitorCsvOutput(boolean csvOutput) {
         properties.setProperty("monitor.csvOutput", Boolean.toString(csvOutput));
+    }
+
+    /**
+     * Retrieves the default file name for JSON output in monitoring mode.
+     *
+     * @return the JSON file name as a String.
+     */
+    public String getMonitorJSONFileName() {
+        return properties.getProperty("monitor.JSONFileName");
+    }
+
+    /**
+     * Sets the default file name for JSON output in monitoring mode.
+     *
+     * @param JSONFileName the new JSON file name.
+     */
+    public synchronized void setMonitorJSONFileName(String JSONFileName) {
+        properties.setProperty("monitor.JSONFileName", JSONFileName);
     }
 
     /**
