@@ -7,6 +7,7 @@ import org.cs250.nan.backend.service.WriteJSONToCSV;
 import org.cs250.nan.backend.service.WriteJSONToKML;
 import org.cs250.nan.backend.database.SaveToMongoDB;
 import org.cs250.nan.backend.database.SpringContext;
+import org.cs250.nan.backend.service.WriteJSONfile;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -60,7 +61,7 @@ public class Scanner {
      * @return a list of JSON objects representing the scan results
      * @throws IOException if an error occurs during scanning
      */
-    public static List<JSONObject> scan(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String kmlFileName, String csvFileName) throws IOException {
+    public static List<JSONObject> scan(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String jsonFileName, String kmlFileName, String csvFileName) throws IOException {
         // Aggregate scan results
         List<JSONObject> collectedScans = new ArrayList<>();
 
@@ -101,6 +102,9 @@ public class Scanner {
         for (JSONObject scan : collectedScans) {
             mongoSaver.insertJSONObject(scan);
         }
+
+        // Write the results to a JSON file
+        WriteJSONfile.writeJSONfile(collectedScans, jsonFileName);
 
         // Optionally write the results to a KML file
         if (kmlOutput) {
