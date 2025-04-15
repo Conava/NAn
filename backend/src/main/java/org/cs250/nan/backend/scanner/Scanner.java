@@ -5,6 +5,8 @@ import org.cs250.nan.backend.parser.WiFiDataParser;
 import org.cs250.nan.backend.service.MergeJSONData;
 import org.cs250.nan.backend.service.WriteJSONToCSV;
 import org.cs250.nan.backend.service.WriteJSONToKML;
+import org.cs250.nan.backend.database.SaveToMongoDB;
+import org.cs250.nan.backend.database.SpringContext;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -93,6 +95,13 @@ public class Scanner {
             collectedScans.addAll(wifiParsedResults);
         }
 
+        // Write Each JSON object from the single scan to MongoDB
+        SaveToMongoDB mongoSaver = SpringContext.getBean(SaveToMongoDB.class);
+
+        for (JSONObject scan : collectedScans) {
+            mongoSaver.insertJSONObject(scan);
+        }
+
         // Optionally write the results to a KML file
         if (kmlOutput) {
             WriteJSONToKML.writeJSONToKML(collectedScans, kmlFileName);
@@ -103,5 +112,11 @@ public class Scanner {
         }
 
         return collectedScans;
+    }
+
+    public static void main(String[] args) {
+
+
+
     }
 }
