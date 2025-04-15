@@ -20,7 +20,7 @@ public class WriteJSONfile {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateTime = sdf.format(new Date());
-        fileName = currentDateTime + "_" + fileName + ".csv";
+        fileName = currentDateTime + "_" + fileName + ".json";
 
         // Create a JSON array to hold all the objects
         JSONArray jsonArray = new JSONArray();
