@@ -107,6 +107,11 @@ public class Scanner {
                 mongoSaver.insertJSONObject(scan);
             }
         }
+        else {
+            System.out.println("MongoDB connection failed: " + mongoOk);
+            System.out.println("Saving locally as a .json file for future upload...");
+            WriteJSONfile.writeJSONfile(collectedScans, "ScanDataPendingUploadToDB");
+        }
 
         // Write the results to a JSON file
         WriteJSONfile.writeJSONfile(collectedScans, jsonFileName);
