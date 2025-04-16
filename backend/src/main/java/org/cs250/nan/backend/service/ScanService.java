@@ -17,13 +17,12 @@ public class ScanService {
      *
      * @param gpsOn enables GPS scanning if true
      * @param kmlOutput writes output in KML format if true
-     * @param scanInterval time interval between scans in seconds
      * @param kmlFileName KML output file name
      * @param csvFileName CSV output file name
      * @return CompletableFuture holding the list of scan results
      */
     @Async
-    public CompletableFuture<List<JSONObject>> runScanAsync(boolean gpsOn, boolean kmlOutput, boolean csvOutput, int scanInterval, String jsonFileName, String kmlFileName, String csvFileName) {
+    public CompletableFuture<List<JSONObject>> runScanAsync(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String jsonFileName, String kmlFileName, String csvFileName) {
         try {
             List<JSONObject> results = Scanner.scan(gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
             return CompletableFuture.completedFuture(results);
