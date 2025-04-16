@@ -64,12 +64,14 @@ public class ApplicationManager {
                                      boolean gpsOn,
                                      boolean kmlOutput,
                                      boolean csvOutput,
+                                     String jsonFileName,
                                      String kmlFileName,
                                      String csvFileName) {
         settings.setMonitorScanInterval(scanInterval);
         settings.setMonitorGpsOn(gpsOn);
         settings.setMonitorKmlOutput(kmlOutput);
         settings.setMonitorCsvOutput(csvOutput);
+        settings.setMonitorJsonFileName(jsonFileName);
         settings.setMonitorKmlFileName(kmlFileName);
         settings.setMonitorCsvFileName(csvFileName);
         settings.saveSettings();
@@ -97,10 +99,11 @@ public class ApplicationManager {
                                Boolean kmlOutput,
                                Boolean csvOutput,
                                Integer scanInterval,
+                               String jsonFileName,
                                String kmlFileName,
                                String csvFileName) {
         Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(
-                gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
+                gpsOn, kmlOutput, csvOutput, scanInterval, jsonFileName, kmlFileName, csvFileName);
         try {
             List<JSONObject> results = futureResults.get();
             int count = (results != null ? results.size() : 0);
