@@ -23,9 +23,9 @@ public class ScanService {
      * @return CompletableFuture holding the list of scan results
      */
     @Async
-    public CompletableFuture<List<JSONObject>> runScanAsync(boolean gpsOn, boolean kmlOutput, boolean csvOutput, int scanInterval, String kmlFileName, String csvFileName) {
+    public CompletableFuture<List<JSONObject>> runScanAsync(boolean gpsOn, boolean kmlOutput, boolean csvOutput, int scanInterval, String jsonFileName, String kmlFileName, String csvFileName) {
         try {
-            List<JSONObject> results = Scanner.scan(gpsOn, kmlOutput, csvOutput, kmlFileName, csvFileName);
+            List<JSONObject> results = Scanner.scan(gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
             return CompletableFuture.completedFuture(results);
         } catch (IOException e) {
             // Handle exception as needed and return a completed future with a null value

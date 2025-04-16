@@ -3,8 +3,12 @@ package org.cs250.nan.backend.scanner;
 import org.cs250.nan.backend.parser.GPSDataParser;
 import org.cs250.nan.backend.parser.WiFiDataParser;
 import org.cs250.nan.backend.service.MergeJSONData;
+import org.cs250.nan.backend.service.WriteJSONfile;
 import org.cs250.nan.backend.service.WriteJSONToCSV;
 import org.cs250.nan.backend.service.WriteJSONToKML;
+import org.cs250.nan.backend.database.SaveToMongoDB;
+import org.cs250.nan.backend.database.SpringContext;
+import org.cs250.nan.backend.database.MongoConnectionChecker;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +62,7 @@ public class Scanner {
      * @return a list of JSON objects representing the scan results
      * @throws IOException if an error occurs during scanning
      */
-    public static List<JSONObject> scan(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String kmlFileName, String csvFileName) throws IOException {
+    public static List<JSONObject> scan(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String jsonFileName, String kmlFileName, String csvFileName) throws IOException {
         // Aggregate scan results
         List<JSONObject> collectedScans = new ArrayList<>();
 
@@ -93,6 +97,25 @@ public class Scanner {
             collectedScans.addAll(wifiParsedResults);
         }
 
+        // If connected to MongoDB, write Each JSON object from the single scan to MongoDB
+        MongoConnectionChecker checker = SpringContext.getBean(MongoConnectionChecker.class);
+        boolean mongoOk = checker.isConnected();
+
+        if (mongoOk) {
+            SaveToMongoDB mongoSaver = SpringContext.getBean(SaveToMongoDB.class);
+            for (JSONObject scan : collectedScans) {
+                mongoSaver.insertJSONObject(scan);
+            }
+        }
+        else {
+            System.out.println("MongoDB connection failed: " + mongoOk);
+            System.out.println("Saving locally as a .json file for future upload...");
+            WriteJSONfile.writeJSONfile(collectedScans, "ScanDataPendingUploadToDB");
+        }
+
+        // Write the results to a JSON file
+        WriteJSONfile.writeJSONfile(collectedScans, jsonFileName);
+
         // Optionally write the results to a KML file
         if (kmlOutput) {
             WriteJSONToKML.writeJSONToKML(collectedScans, kmlFileName);
@@ -103,5 +126,11 @@ public class Scanner {
         }
 
         return collectedScans;
+    }
+
+    public static void main(String[] args) {
+
+
+
     }
 }
