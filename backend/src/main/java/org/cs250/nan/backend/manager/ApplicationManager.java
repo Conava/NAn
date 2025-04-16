@@ -98,12 +98,11 @@ public class ApplicationManager {
     public String doSingleScan(Boolean gpsOn,
                                Boolean kmlOutput,
                                Boolean csvOutput,
-                               Integer scanInterval,
                                String jsonFileName,
                                String kmlFileName,
                                String csvFileName) {
         Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(
-                gpsOn, kmlOutput, csvOutput, scanInterval, jsonFileName, kmlFileName, csvFileName);
+                gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
         try {
             List<JSONObject> results = futureResults.get();
             int count = (results != null ? results.size() : 0);
