@@ -34,9 +34,10 @@ public class ShellController {
                                    @ShellOption(defaultValue = "true") boolean gpsOn,
                                    @ShellOption(defaultValue = "true") boolean kmlOutput,
                                    @ShellOption(defaultValue = "false") boolean csvOutput,
+                                   @ShellOption(defaultValue = "monitorJSON") String jsonFileName,
                                    @ShellOption(defaultValue = "monitorKML") String kmlFileName,
                                    @ShellOption(defaultValue = "monitorCSV") String csvFileName) {
-        return applicationManager.doUpdateMonitoring(scanInterval, gpsOn, kmlOutput, csvOutput, kmlFileName, csvFileName);
+        return applicationManager.doUpdateMonitoring(scanInterval, gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
     }
 
     @ShellMethod(value = "Reset all settings to default", key = "resetSettings")
@@ -49,8 +50,9 @@ public class ShellController {
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
                              @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
+                             @ShellOption(defaultValue = ShellOption.NULL) String jsonFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
-        return applicationManager.doSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, kmlFileName, csvFileName);
+        return applicationManager.doSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, jsonFileName, kmlFileName, csvFileName);
     }
 }
