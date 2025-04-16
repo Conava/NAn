@@ -36,7 +36,6 @@ public class singleScanManager {
     public Future<List<JSONObject>> runSingleScan(Boolean gpsOn,
                                                   Boolean kmlOutput,
                                                   Boolean csvOutput,
-                                                  Integer scanInterval,
                                                   String JsonFileName,
                                                   String kmlFileName,
                                                   String csvFileName) {
@@ -44,12 +43,10 @@ public class singleScanManager {
         boolean effectiveGpsOn = Objects.nonNull(gpsOn) ? gpsOn : settings.isDefaultUseOfGps();
         boolean effectiveKmlOutput = Objects.nonNull(kmlOutput) ? kmlOutput : settings.isMonitorKmlOutput();
         boolean effectiveCsvOutput = Objects.nonNull(csvOutput) ? csvOutput : settings.isMonitorCsvOutput();
-        int effectiveScanInterval = Objects.nonNull(scanInterval) ? scanInterval : settings.getMonitorScanInterval();
         String effectiveJsonFileName = Objects.nonNull(JsonFileName) ? JsonFileName : settings.getMonitorKmlFileName();
         String effectiveKmlFileName = Objects.nonNull(kmlFileName) ? kmlFileName : settings.getMonitorKmlFileName();
         String effectiveCsvFileName = Objects.nonNull(csvFileName) ? csvFileName : settings.getMonitorCsvFileName();
 
-        return singleScanManager.runScanAsync(effectiveGpsOn, effectiveKmlOutput, effectiveCsvOutput,
-                effectiveScanInterval, effectiveJsonFileName, effectiveKmlFileName, effectiveCsvFileName);
+        return singleScanManager.runScanAsync(effectiveGpsOn, effectiveKmlOutput, effectiveCsvOutput, effectiveJsonFileName, effectiveKmlFileName, effectiveCsvFileName);
     }
 }
