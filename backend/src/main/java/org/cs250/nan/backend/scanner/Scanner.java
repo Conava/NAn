@@ -127,10 +127,4 @@ public class Scanner {
 
         return collectedScans;
     }
-
-    public static void main(String[] args) {
-
-
-
-    }
 }
