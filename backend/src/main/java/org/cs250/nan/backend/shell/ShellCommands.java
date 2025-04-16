@@ -113,7 +113,6 @@ public class ShellCommands {
      * @param gpsOn        flag indicating whether GPS should be enabled.
      * @param kmlOutput    flag indicating whether KML output is enabled.
      * @param csvOutput    flag indicating whether CSV output is enabled.
-     * @param scanInterval the scan interval, though for a single scan this value is used only as a parameter.
      * @param jsonFileName  the file name for KML output.
      * @param kmlFileName  the file name for KML output.
      * @param csvFileName  the file name for CSV output.
@@ -123,11 +122,10 @@ public class ShellCommands {
     public String singleScan(@ShellOption(defaultValue = ShellOption.NULL) Boolean gpsOn,
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
-                             @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
                              @ShellOption(defaultValue = ShellOption.NULL) String jsonFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
-        Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, jsonFileName, kmlFileName, csvFileName);
+        Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
         try {
             List<JSONObject> results = futureResults.get();
             LOGGER.info("Single scan completed with {} result(s).", results != null ? results.size() : 0);
