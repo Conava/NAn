@@ -4,7 +4,7 @@
 
     <!-- Show table if we have any data -->
     <div v-if="tableData.length">
-      <table border="1">
+      <table>
         <thead>
         <tr>
           <!-- Use the first row of CSV as the headers -->
