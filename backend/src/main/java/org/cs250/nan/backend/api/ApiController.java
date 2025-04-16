@@ -46,7 +46,7 @@ public class ApiController {
 
     @GetMapping("/scan")
     public ResponseEntity<String> singleScan() {
-        String message = applicationManager.doSingleScan(null, null, null, null, null, null, null);
+        String message = applicationManager.doSingleScan(null, null, null, null, null, null);
         return ResponseEntity.ok(message);
     }
 }
