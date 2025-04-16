@@ -58,7 +58,6 @@ public class MonitoringManager {
                         settings.isMonitorGpsOn(),
                         settings.isMonitorKmlOutput(),
                         settings.isMonitorCsvOutput(),
-                        interval,
                         settings.getMonitorJsonFileName(),
                         settings.getMonitorKmlFileName(),
                         settings.getMonitorCsvFileName());
