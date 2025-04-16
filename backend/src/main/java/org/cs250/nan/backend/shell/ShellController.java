@@ -49,10 +49,9 @@ public class ShellController {
     public String singleScan(@ShellOption(defaultValue = ShellOption.NULL) Boolean gpsOn,
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
                              @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
-                             @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
                              @ShellOption(defaultValue = ShellOption.NULL) String jsonFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
                              @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
-        return applicationManager.doSingleScan(gpsOn, kmlOutput, csvOutput, scanInterval, jsonFileName, kmlFileName, csvFileName);
+        return applicationManager.doSingleScan(gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
     }
 }
