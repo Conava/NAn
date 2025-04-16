@@ -31,9 +31,10 @@ public class ApiController {
                                                    @RequestParam boolean gpsOn,
                                                    @RequestParam boolean kmlOutput,
                                                    @RequestParam boolean csvOutput,
+                                                   @RequestParam String jsonName,
                                                    @RequestParam String kmlName,
                                                    @RequestParam String csvName) {
-        String message = applicationManager.doUpdateMonitoring(interval, gpsOn, kmlOutput, csvOutput, kmlName, csvName);
+        String message = applicationManager.doUpdateMonitoring(interval, gpsOn, kmlOutput, csvOutput, jsonName, kmlName, csvName);
         return ResponseEntity.ok(message);
     }
 
@@ -45,7 +46,7 @@ public class ApiController {
 
     @GetMapping("/scan")
     public ResponseEntity<String> singleScan() {
-        String message = applicationManager.doSingleScan(null, null, null, null, null, null);
+        String message = applicationManager.doSingleScan(null, null, null, null, null, null, null);
         return ResponseEntity.ok(message);
     }
 }
