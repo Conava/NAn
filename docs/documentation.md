@@ -24,4 +24,10 @@
 
 ## Usage
 
+# 3. Testing
+
+## API Testing
+
+### 1. Insomnia
+
 ## Known Issues
