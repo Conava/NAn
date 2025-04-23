@@ -45,6 +45,7 @@ public class ApplicationManager {
                               AppProperties props,
                               SettingsService settingsService,
                               ConfigurableApplicationContext context) {
+
         this.monitoringManager = monitoringManager;
         this.singleScanService = singleScanService;
         this.jsonWriterService = jsonWriterService;
