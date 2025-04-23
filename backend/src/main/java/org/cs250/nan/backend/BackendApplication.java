@@ -1,80 +1,37 @@
 package org.cs250.nan.backend;
 
-import lombok.Getter;
-import org.cs250.nan.backend.config.Settings;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import java.util.List;
-
-/**
- * Main application entry point for the backend.
- * <p>
- * This class starts the Spring Boot application.
- * </p>
- */
-@Getter
 @SpringBootApplication
 @EnableAsync
 public class BackendApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackendApplication.class);
-    private static final List<String> VALID_OPTIONS = List.of(""); // Empty for now as program arguments are not supported.
-    /**
-     * -- GETTER --
-     *  Returns the application context.
-     *
-     * @return The application context.
-     */
-    @Getter
-    private static ApplicationContext applicationContext;
-    /**
-     * -- GETTER --
-     *  Returns the application settings.
-     *
-     * @return The application settings.
-     */
-    @Getter
-    private static Settings settings;
 
-    /**
-     * Application entry point.
-     *
-     * @param args Command line arguments.
-     */
     public static void main(String[] args) {
-        for (String arg : args) {
-            if (!VALID_OPTIONS.contains(arg)) {
-                System.err.println("Unknown command line parameter: " + arg);
-                System.exit(1);
-            }
-        }
-        settings = new Settings();
-        System.setProperty("logging.file.name", settings.getLogFilePath());
-        LOGGER.info("Configured log file path: {}", settings.getLogFilePath());
-        LOGGER.info("Starting NAn NetworkAnalyzer...");
-        LOGGER.info(getEnvironmentDetails());
-        applicationContext = SpringApplication.run(BackendApplication.class, args);
-        LOGGER.info("NAn started successfully.");
+        SpringApplication.run(BackendApplication.class, args);
     }
+
 
     /**
-     * Prints the environment details for diagnostic purposes.
-     * <p>
-     * Displays the operating system, architecture, Java version, user home directory,
-     * and current working directory.
-     * </p>
+     * Logs environment details once the application is up.
      */
-    private static String getEnvironmentDetails() {
-        return "Environment Details:\n" +
-                "Operating System: " + System.getProperty("os.name").toLowerCase() + "\n" +
-                "Architecture    : " + System.getProperty("os.arch") + "\n" +
-                "Java Version    : " + System.getProperty("java.version") + "\n" +
-                "User Home Dir   : " + System.getProperty("user.home") + "\n" +
-                "Current Dir     : " + System.getProperty("user.dir") + "\n";
+    @Bean
+    public ApplicationRunner logEnvironment() {
+        return args -> {
+            LOGGER.info("NAn NetworkAnalyzer started successfully 🚀");
+            LOGGER.info("Environment Details:");
+            LOGGER.info("  OS    : {}", System.getProperty("os.name"));
+            LOGGER.info("  Arch  : {}", System.getProperty("os.arch"));
+            LOGGER.info("  Java  : {}", System.getProperty("java.version"));
+            LOGGER.info("  Home  : {}", System.getProperty("user.home"));
+            LOGGER.info("  CWD   : {}", System.getProperty("user.dir"));
+        };
     }
-
 }

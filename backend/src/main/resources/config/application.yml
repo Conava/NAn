@@ -1,0 +1,39 @@
+# ~/.config/NAn/application.yml  OR  %LOCALAPPDATA%\NAn\application.yml
+
+app:
+  # ─── Base directory for ALL files ───────────────────────────────────────
+  # On Windows this picks up LOCALAPPDATA (e.g. C:\Users\Name\AppData\Local)
+  # On Linux/macOS it falls back to ~/.config
+  base-dir: ${LOCALAPPDATA:${user.home}/.config}/NAn
+
+  # ─── General settings ──────────────────────────────────────────────────
+  data-storage: ${app.base-dir}/data
+  default-use-gps: true
+  keep-history: true
+  activate-gui: true
+  log-file: ${app.base-dir}/log.txt
+
+  # ─── Database settings ─────────────────────────────────────────────────
+  db:
+    remote-enabled: false
+    remote-url: mongodb://localhost
+
+  # ─── Monitoring defaults ───────────────────────────────────────────────
+  monitor:
+    scan-interval: 60        # seconds
+    gps-on: true
+    kml-output: true
+    csv-output: false
+
+    # filenames only (your code can prefix them with data-storage or base-dir)
+    json-file-name: monitorJson
+    kml-file-name: monitorKML
+    csv-file-name: monitorCSV
+
+spring:
+  config:
+    name: settings
+    additional-location: "optional:file:${app.base-dir}/"
+logging:
+  file:
+    name: ${app.log-file}

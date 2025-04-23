@@ -1,138 +1,267 @@
 package org.cs250.nan.backend.shell;
 
-import org.cs250.nan.backend.config.Settings;
-import org.cs250.nan.backend.service.singleScanManager;
-import org.cs250.nan.backend.service.MonitoringManager;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.cs250.nan.backend.config.AppProperties;
+import org.cs250.nan.backend.manager.ApplicationManager;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * The ShellCommands class provides shell-accessible operations to control monitoring mode,
- * update monitoring settings, and run single scans. These commands allow runtime interaction
- * with the monitoring feature using the current settings.
- */
 @ShellComponent
 public class ShellCommands {
+    private final ApplicationManager appMgr;
+    private final AppProperties props;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShellCommands.class);
-
-    private final singleScanManager singleScanManager;
-    private final MonitoringManager monitoringManager;
-    private final Settings settings;
-
-    /**
-     * Constructs the ShellCommands with injected services.
-     *
-     * @param singleScanManager       the manager responsible for running scans.
-     * @param monitoringManager the manager responsible for continuous monitoring scans.
-     * @param settings          the configuration settings for monitoring.
-     */
-    @Autowired
-    public ShellCommands(singleScanManager singleScanManager, MonitoringManager monitoringManager, Settings settings) {
-        this.singleScanManager = singleScanManager;
-        this.monitoringManager = monitoringManager;
-        this.settings = settings;
+    public ShellCommands(ApplicationManager appMgr, AppProperties props) {
+        this.appMgr = appMgr;
+        this.props = props;
     }
 
-    /**
-     * Starts the monitoring mode. Continuous scans will begin using the current monitoring settings.
-     *
-     * @return a confirmation message indicating monitoring mode is enabled.
-     */
-    @ShellMethod(value = "Start monitoring mode", key = "startMonitoring")
+    // ─── Shutdown aliases ────────────────────────────────────────────────────
+
+    @ShellMethod(value = "Shutdown the application", key = {"shutdown", "exit", "quit", "stop"})
+    public String shutdown() {
+        return appMgr.shutdownApplication();
+    }
+
+    // ─── Monitoring Control ─────────────────────────────────────────────────
+
+    @ShellMethod(value = "Start continuous monitoring", key = "monitor start")
     public String startMonitoring() {
-        monitoringManager.startMonitoring();
-        LOGGER.info("Monitoring mode enabled via shell.");
-        return "Monitoring mode enabled.";
+        return appMgr.startMonitoring();
     }
 
-    /**
-     * Stops the monitoring mode.
-     *
-     * @return a confirmation message indicating monitoring mode is disabled.
-     */
-    @ShellMethod(value = "Stop monitoring mode", key = "stopMonitoring")
+    @ShellMethod(value = "Stop continuous monitoring", key = "monitor stop")
     public String stopMonitoring() {
-        monitoringManager.stopMonitoring();
-        LOGGER.info("Monitoring mode disabled via shell.");
-        return "Monitoring mode disabled.";
+        return appMgr.stopMonitoring();
     }
 
-    /**
-     * Updates the monitoring settings based on provided parameters and restarts monitoring if active.
-     *
-     * @param scanInterval the new scan interval (in seconds) for monitoring.
-     * @param gpsOn        flag indicating whether GPS should be enabled.
-     * @param kmlOutput    flag indicating whether KML output is enabled.
-     * @param csvOutput    flag indicating whether CSV output is enabled.
-     * @param kmlFileName  the new file name for KML output.
-     * @param csvFileName  the new file name for CSV output.
-     * @return a confirmation message indicating that monitoring settings have been updated.
-     */
-    @ShellMethod(value = "Update monitoring settings", key = "updateMonitoring")
-    public String updateMonitoring(@ShellOption(defaultValue = "5") int scanInterval,
-                                   @ShellOption(defaultValue = "true") boolean gpsOn,
-                                   @ShellOption(defaultValue = "true") boolean kmlOutput,
-                                   @ShellOption(defaultValue = "false") boolean csvOutput,
-                                   @ShellOption(defaultValue = "monitorKML") String kmlFileName,
-                                   @ShellOption(defaultValue = "monitorCSV") String csvFileName) {
-        settings.setMonitorScanInterval(scanInterval);
-        settings.setMonitorGpsOn(gpsOn);
-        settings.setMonitorKmlOutput(kmlOutput);
-        settings.setMonitorCsvOutput(csvOutput);
-        settings.setMonitorKmlFileName(kmlFileName);
-        settings.setMonitorCsvFileName(csvFileName);
-        settings.saveSettings();
-        // Restart monitoring if it is already active.
-        monitoringManager.stopMonitoring();
-        monitoringManager.startMonitoring();
-        LOGGER.info("Monitoring settings updated via shell.");
-        return "Monitoring settings updated.";
+    // ─── One-Off Scans ───────────────────────────────────────────────────────
+
+    @ShellMethod(value = "Run a one-off scan with defaults", key = "scan run-default")
+    public String scanDefault() {
+        return appMgr.runSingleScan(null).join();
     }
 
-    @ShellMethod(value = "Reset all settings to default", key = "resetSettings")
-    public String resetSettings() {
-        settings.resetToDefaults();
-        LOGGER.info("Settings have been reset to default via shell.");
-        return "Settings have been reset to default.";
+    @ShellMethod(value = "Run a one-off scan overriding monitor settings", key = "scan run")
+    public String scanRun(
+            @ShellOption(defaultValue = ShellOption.NULL) Integer scanInterval,
+            @ShellOption(defaultValue = ShellOption.NULL) Boolean gpsOn,
+            @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
+            @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
+            @ShellOption(defaultValue = ShellOption.NULL) String jsonFileName,
+            @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
+            @ShellOption(defaultValue = ShellOption.NULL) String csvFileName
+    ) {
+        // build override config
+        var base = props.getMonitor();
+        var cfg = new AppProperties.Monitor();
+        cfg.setScanInterval(base.getScanInterval());
+        cfg.setGpsOn(base.isGpsOn());
+        cfg.setKmlOutput(base.isKmlOutput());
+        cfg.setCsvOutput(base.isCsvOutput());
+        cfg.setJsonFileName(base.getJsonFileName());
+        cfg.setKmlFileName(base.getKmlFileName());
+        cfg.setCsvFileName(base.getCsvFileName());
+
+        if (scanInterval != null) cfg.setScanInterval(scanInterval);
+        if (gpsOn != null) cfg.setGpsOn(gpsOn);
+        if (kmlOutput != null) cfg.setKmlOutput(kmlOutput);
+        if (csvOutput != null) cfg.setCsvOutput(csvOutput);
+        if (jsonFileName != null) cfg.setJsonFileName(jsonFileName);
+        if (kmlFileName != null) cfg.setKmlFileName(kmlFileName);
+        if (csvFileName != null) cfg.setCsvFileName(csvFileName);
+
+        return appMgr.runSingleScan(cfg).join();
     }
 
-    /**
-     * Runs a single scan using the specified parameters.
-     * This operation can execute concurrently with an active monitoring mode.
-     *
-     * @param gpsOn        flag indicating whether GPS should be enabled.
-     * @param kmlOutput    flag indicating whether KML output is enabled.
-     * @param csvOutput    flag indicating whether CSV output is enabled.
-     * @param jsonFileName  the file name for KML output.
-     * @param kmlFileName  the file name for KML output.
-     * @param csvFileName  the file name for CSV output.
-     * @return a message indicating the number of results from the single scan.
-     */
-    @ShellMethod(value = "Run single scan", key = "singleScan")
-    public String singleScan(@ShellOption(defaultValue = ShellOption.NULL) Boolean gpsOn,
-                             @ShellOption(defaultValue = ShellOption.NULL) Boolean kmlOutput,
-                             @ShellOption(defaultValue = ShellOption.NULL) Boolean csvOutput,
-                             @ShellOption(defaultValue = ShellOption.NULL) String jsonFileName,
-                             @ShellOption(defaultValue = ShellOption.NULL) String kmlFileName,
-                             @ShellOption(defaultValue = ShellOption.NULL) String csvFileName) {
-        Future<List<JSONObject>> futureResults = singleScanManager.runSingleScan(gpsOn, kmlOutput, csvOutput, jsonFileName, kmlFileName, csvFileName);
-        try {
-            List<JSONObject> results = futureResults.get();
-            LOGGER.info("Single scan completed with {} result(s).", results != null ? results.size() : 0);
-            return "Single scan completed with " + (results != null ? results.size() : 0) + " result(s).";
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error during single scan: {}", e.getMessage(), e);
-            return "An error occurred during single scan: " + e.getMessage();
+    // ─── Monitoring Data & State ─────────────────────────────────────────────
+
+    @ShellMethod(value = "Export monitoring data to JSON file", key = "monitor export")
+    public String exportData(@ShellOption(defaultValue = "monitorData") String fileName) {
+        return appMgr.exportMonitoringData(fileName);
+    }
+
+    @ShellMethod(value = "Show collected monitoring data", key = "monitor data")
+    public List<Object> showData() {
+        return appMgr.getMonitoringData().stream()
+                .map(o -> ((Map<?, ?>) ((org.json.JSONObject) o).toMap()))
+                .collect(Collectors.toList());
+    }
+
+    @ShellMethod(value = "Show application state", key = "app state")
+    public String showState() {
+        var s = appMgr.getApplicationState();
+        return String.format(
+                "Monitoring: %s%nLast Scan: %s%nResults  : %d",
+                s.monitoring(), s.lastScanTime(), s.lastScanResultCount()
+        );
+    }
+
+    // ─── Settings Show/Update ─────────────────────────────────────────────────
+
+    @ShellMethod(value = "Show current settings", key = "settings show")
+    public String showSettings() {
+        // 1) prepare a list of "key : value" strings
+        var p = props;
+        List<String> rows = List.of(
+                "base-dir           : " + p.getBaseDir(),
+                "data-storage       : " + p.getDataStorage(),
+                "default-use-gps    : " + p.isDefaultUseGps(),
+                "keep-history       : " + p.isKeepHistory(),
+                "activate-gui       : " + p.isActivateGui(),
+                "log-file           : " + p.getLogFile(),
+                "",
+                "db.remote-enabled  : " + p.getDb().isRemoteEnabled(),
+                "db.remote-url      : " + p.getDb().getUri(),
+                "",
+                "monitor.interval   : " + p.getMonitor().getScanInterval(),
+                "monitor.gps-on     : " + p.getMonitor().isGpsOn(),
+                "monitor.kml-out    : " + p.getMonitor().isKmlOutput(),
+                "monitor.csv-out    : " + p.getMonitor().isCsvOutput(),
+                "monitor.json-file  : " + p.getMonitor().getJsonFileName(),
+                "monitor.kml-file   : " + p.getMonitor().getKmlFileName(),
+                "monitor.csv-file   : " + p.getMonitor().getCsvFileName()
+        );
+
+        // 2) compute the maximum row length
+        int max = rows.stream().mapToInt(String::length).max().orElse(0);
+
+        // 3) draw top border, centering the title
+        String title = " Current Settings ";
+        int pad = (max - title.length()) / 2;
+        String top = "╔"
+                + "═".repeat(pad)
+                + title
+                + "═".repeat(max - title.length() - pad)
+                + "╗";
+
+        // 4) draw each row, padding to 'max'
+        List<String> boxed = new ArrayList<>();
+        boxed.add(top);
+        for (String row : rows) {
+            String content = row;
+            // if empty, show blank line
+            if (row.isEmpty()) {
+                content = "";
+            }
+            boxed.add("║ "
+                    + content
+                    + " ".repeat(max - content.length())
+                    + " ║");
         }
+        // 5) bottom border
+        boxed.add("╚" + "═".repeat(max + 2) + "╝");
+
+        return String.join("\n", boxed);
+    }
+
+    @ShellMethod(value = "Bulk‐set one or more settings: key=value …", key = "settings set")
+    public String setSettings(
+            @ShellOption(arity = Integer.MAX_VALUE, help = "pairs like base-dir=/path data-storage=/other …")
+            String[] pairs
+    ) {
+        // start from current
+        AppProperties p = new AppProperties();
+        // copy existing
+        p.setBaseDir(props.getBaseDir());
+        p.setDataStorage(props.getDataStorage());
+        p.setDefaultUseGps(props.isDefaultUseGps());
+        p.setKeepHistory(props.isKeepHistory());
+        p.setActivateGui(props.isActivateGui());
+        p.setLogFile(props.getLogFile());
+        p.getDb().setRemoteEnabled(props.getDb().isRemoteEnabled());
+        p.getDb().setUri(props.getDb().getUri());
+        var m = p.getMonitor();
+        var b = props.getMonitor();
+        m.setScanInterval(b.getScanInterval());
+        m.setGpsOn(b.isGpsOn());
+        m.setKmlOutput(b.isKmlOutput());
+        m.setCsvOutput(b.isCsvOutput());
+        m.setJsonFileName(b.getJsonFileName());
+        m.setKmlFileName(b.getKmlFileName());
+        m.setCsvFileName(b.getCsvFileName());
+
+        var changed = new ArrayList<String>();
+        for (var pair : pairs) {
+            var parts = pair.split("=", 2);
+            if (parts.length != 2) continue;
+            var k = parts[0].trim();
+            var v = parts[1].trim();
+            try {
+                switch (k) {
+                    case "base-dir" -> {
+                        p.setBaseDir(v);
+                        changed.add(k);
+                    }
+                    case "data-storage" -> {
+                        p.setDataStorage(v);
+                        changed.add(k);
+                    }
+                    case "default-use-gps" -> {
+                        p.setDefaultUseGps(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "keep-history" -> {
+                        p.setKeepHistory(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "activate-gui" -> {
+                        p.setActivateGui(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "log-file" -> {
+                        p.setLogFile(v);
+                        changed.add(k);
+                    }
+                    case "db.remote-enabled" -> {
+                        p.getDb().setRemoteEnabled(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "db.remote-url" -> {
+                        p.getDb().setUri(v);
+                        changed.add(k);
+                    }
+                    case "monitor.interval" -> {
+                        p.getMonitor().setScanInterval(Integer.parseInt(v));
+                        changed.add(k);
+                    }
+                    case "monitor.gps-on" -> {
+                        p.getMonitor().setGpsOn(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "monitor.kml-out" -> {
+                        p.getMonitor().setKmlOutput(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "monitor.csv-out" -> {
+                        p.getMonitor().setCsvOutput(Boolean.parseBoolean(v));
+                        changed.add(k);
+                    }
+                    case "monitor.json-file" -> {
+                        p.getMonitor().setJsonFileName(v);
+                        changed.add(k);
+                    }
+                    case "monitor.kml-file" -> {
+                        p.getMonitor().setKmlFileName(v);
+                        changed.add(k);
+                    }
+                    case "monitor.csv-file" -> {
+                        p.getMonitor().setCsvFileName(v);
+                        changed.add(k);
+                    }
+                    default -> {
+                        return "Unknown setting key: " + k;
+                    }
+                }
+            } catch (Exception ex) {
+                return "Invalid value for " + k + ": " + v;
+            }
+        }
+
+        String result = appMgr.updateSettings(p);
+        return "Updated [" + String.join(", ", changed) + "] → " + result;
     }
 }

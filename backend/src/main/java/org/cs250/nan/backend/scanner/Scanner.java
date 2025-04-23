@@ -1,116 +1,80 @@
 package org.cs250.nan.backend.scanner;
 
-import org.cs250.nan.backend.parser.GPSDataParser;
-import org.cs250.nan.backend.parser.WiFiDataParser;
-import org.cs250.nan.backend.service.CsvWriterService;
-import org.cs250.nan.backend.service.KmlGeneratorService;
-import org.cs250.nan.backend.service.MergeJsonDataService;
-import org.cs250.nan.backend.service.WriteJSONfile;
-import org.cs250.nan.backend.database.SaveToMongoDB;
-import org.cs250.nan.backend.database.SpringContext;
 import org.cs250.nan.backend.database.MongoConnectionChecker;
+import org.cs250.nan.backend.database.SaveToMongoDB;
+import org.cs250.nan.backend.service.*;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Scanner class performs a single scan for WiFi and optional GPS data.
- *
- * <p>
- * This implementation delegates fetching and parsing of WiFi and GPS scan data,
- * then merges the results. If enabled, it outputs the aggregated results into a
- * KML file (using the KML generator service) and/or a CSV file.
- * </p>
+ * Unified Scanner component performing Wi-Fi + optional GPS,
+ * merging results, writing to DB or files.
  */
 @Component
 public class Scanner {
-
-    private final KmlGeneratorService kmlGeneratorService;
-    private final CsvWriterService csvWriterService;
-    private final MergeJsonDataService mergeJsonDataService;
+    private final WiFiScanner wifi;
+    private final GPSScanner gps;
+    private final MergeJsonDataService mergeService;
+    private final JsonWriterService jsonWriter;
+    private final KmlGeneratorService kmlService;
+    private final CsvWriterService csvService;
+    private final MongoConnectionChecker mongoChecker;
+    private final SaveToMongoDB mongoSaver;
 
     @Autowired
-    public Scanner(KmlGeneratorService kmlGeneratorService, CsvWriterService csvWriterService, MergeJsonDataService mergeJsonDataService) {
-        this.kmlGeneratorService = kmlGeneratorService;
-        this.csvWriterService = csvWriterService;
-        this.mergeJsonDataService = mergeJsonDataService;
+    public Scanner(SystemWiFiScanner wifi,
+                   SystemGPSScanner gps,
+                   MergeJsonDataService mergeService,
+                   JsonWriterService jsonWriter,
+                   KmlGeneratorService kmlService,
+                   CsvWriterService csvService,
+                   MongoConnectionChecker mongoChecker,
+                   SaveToMongoDB mongoSaver) {
+        this.wifi = wifi;
+        this.gps = gps;
+        this.mergeService = mergeService;
+        this.jsonWriter = jsonWriter;
+        this.kmlService = kmlService;
+        this.csvService = csvService;
+        this.mongoChecker = mongoChecker;
+        this.mongoSaver = mongoSaver;
     }
 
-    /**
-     * Performs the data scan for WiFi and optional GPS data.
-     *
-     * @param gpsOn       whether to perform a GPS scan
-     * @param kmlOutput   whether to output to a KML file
-     * @param csvOutput   whether to output to a CSV file
-     * @param kmlFileName the file name for the KML output (without extension)
-     * @param csvFileName the file name for the CSV output (without extension)
-     * @return a list of JSON objects representing the merged scan results
-     * @throws IOException if an error occurs during scanning or file writing
-     */
-    public List<JSONObject> scan(boolean gpsOn, boolean kmlOutput, boolean csvOutput, String jsonFileName, String kmlFileName, String csvFileName)
-            throws IOException {
-        List<JSONObject> collectedScans = new ArrayList<>();
+    public List<JSONObject> scan(boolean gpsOn,
+                                 boolean kmlOutput,
+                                 boolean csvOutput,
+                                 String jsonFileName,
+                                 String kmlFileName,
+                                 String csvFileName) throws IOException {
+        // 1) Wi-Fi
+        var wifiList = wifi.scan();
 
-        // Get WiFi scan data
-        WiFiScanner wifiScanner = new WiFiScanner();
-        String wifiScanResult = wifiScanner.scan();
-
-        if (wifiScanResult == null || wifiScanResult.trim().isEmpty()) {
-            System.out.println("WiFi scan returned an empty result.");
-            return collectedScans;
-        }
-
-        // Parse WiFi scan results
-        List<JSONObject> wifiParsedResults = WiFiDataParser.parseStringToListOfJSON(wifiScanResult);
-
-        // If GPS scanning is enabled, merge GPS data with WiFi results
+        // 2) GPS
+        List<JSONObject> merged;
         if (gpsOn) {
-            GPSScanner gpsScanner = new GPSScanner();
-            String gpsScanResult = gpsScanner.scan();
-
-            if (gpsScanResult != null && !gpsScanResult.trim().isEmpty()) {
-                JSONObject gpsParsedResult = GPSDataParser.parseStringToJSON(gpsScanResult);
-                collectedScans.addAll(mergeJsonDataService.mergeJSONObjects(wifiParsedResults, gpsParsedResult));
-            } else {
-                collectedScans.addAll(wifiParsedResults);
-            }
+            var gpsObj = gps.scan();
+            merged = mergeService.mergeJSONObjects(wifiList, gpsObj);
         } else {
-            collectedScans.addAll(wifiParsedResults);
+            merged = new ArrayList<>(wifiList);
         }
 
-        // Output KML file using the injected KML generator service
-        // If connected to MongoDB, write Each JSON object from the single scan to MongoDB
-        MongoConnectionChecker checker = SpringContext.getBean(MongoConnectionChecker.class);
-        boolean mongoOk = checker.isConnected();
-
-        if (mongoOk) {
-            SaveToMongoDB mongoSaver = SpringContext.getBean(SaveToMongoDB.class);
-            for (JSONObject scan : collectedScans) {
-                mongoSaver.insertJSONObject(scan);
-            }
+        // 3) Persist or buffer
+        if (mongoChecker.isConnected()) {
+            merged.forEach(mongoSaver::insertJSONObject);
         } else {
-            System.out.println("MongoDB connection failed: " + mongoOk);
-            System.out.println("Saving locally as a .json file for future upload...");
-            WriteJSONfile.writeJSONfile(collectedScans, "ScanDataPendingUploadToDB");
+            jsonWriter.writeJsonFile(merged, "ScanPendingUpload");
         }
 
-        // Write the results to a JSON file
-        WriteJSONfile.writeJSONfile(collectedScans, jsonFileName);
+        // 4) File outputs
+        jsonWriter.writeJsonFile(merged, jsonFileName);
+        if (kmlOutput) kmlService.generateKml(merged, kmlFileName);
+        if (csvOutput) csvService.writeJsonListToCsv(merged, csvFileName);
 
-        // Optionally write the results to a KML file
-        if (kmlOutput) {
-            kmlGeneratorService.generateKml(collectedScans, kmlFileName);
-        }
-
-        // Output CSV file
-        if (csvOutput) {
-            csvWriterService.writeJsonListToCsv(collectedScans, csvFileName);
-        }
-
-        return collectedScans;
+        return merged;
     }
 }
