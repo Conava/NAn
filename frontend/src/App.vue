@@ -1,80 +1,38 @@
 <template>
-  <div id="app">
-    <h1>CSV Data Viewer</h1>
+  <div class="p-4">
+    <h1>Network Analyzer GUI</h1>
+    <button @click="runScan">Run Scan</button>
 
-    <!-- Show table if we have any data -->
-    <div v-if="tableData.length">
-      <table>
-        <thead>
-        <tr>
-          <!-- Use the first row of CSV as the headers -->
-          <th v-for="(header, index) in tableData[0]" :key="index">
-            {{ header }}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Loop through each row after the header (starting from index 1) -->
-        <tr v-for="(row, rowIndex) in tableData.slice(1)" :key="rowIndex">
-          <!-- Loop through each cell in the row -->
-          <td v-for="(cell, cellIndex) in row" :key="cellIndex">
-            {{ cell }}
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- If there's no data yet, show a loading message -->
-    <p v-else>Loading data...</p>
+    <h2>Scan Results</h2>
+    <table v-if="results.length">
+      <thead>
+      <tr>
+        <th v-for="(val, key) in results[0]" :key="key">{{ key }}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="(item, index) in results" :key="index">
+        <td v-for="(val, key) in item" :key="key">{{ val }}</td>
+      </tr>
+      </tbody>
+    </table>
+    <p v-else>No data yet.</p>
   </div>
 </template>
 
-<script setup>
-// Vue composition API: we use ref to create a reactive variable
-import { ref, onMounted } from 'vue'
-// PapaParse is a library to parse CSV into usable data
-import Papa from 'papaparse'
+<script lang="ts" setup>
+import { ref } from 'vue'
+import axios from 'axios'
 
-// This will hold our parsed CSV data
-const tableData = ref([])
+const results = ref<any[]>([])
 
-// Run this code when the component is mounted (i.e., page loads)
-onMounted(async () => {
+async function runScan() {
   try {
-    // Fetch the CSV file from the backend
-    const response = await fetch('http://localhost:8080/api/data')
-    // Convert the response to text (raw CSV)
-    const csvText = await response.text()
-
-    // Use PapaParse to convert CSV text to a JavaScript array
-    Papa.parse(csvText, {
-      complete: (results) => {
-        // Save the parsed data so it triggers reactivity in the table
-        tableData.value = results.data
-      }
-    })
-  } catch (error) {
-    // Log errors if something goes wrong (e.g., network issues)
-    console.error('Failed to fetch CSV:', error)
+    await axios.get('http://localhost:8080/api/scan') // Start scan
+    const res = await axios.get('http://localhost:8080/api/monitor/data') // Get results
+    results.value = res.data
+  } catch (err) {
+    console.error('Scan failed:', err)
   }
-})
+}
 </script>
-
-<style>
-/* Basic styling for the page and table */
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 8px;
-  text-align: left;
-}
-</style>
