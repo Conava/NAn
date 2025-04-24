@@ -33,7 +33,7 @@ app:
 spring:
   config:
     name: settings
-    additional-location: "optional:file:${app.base-dir}/"
+    import: optional:file:${app.base-dir}/settings.yml
 logging:
   file:
     name: ${app.log-file}
