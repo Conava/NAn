@@ -15,8 +15,6 @@
 - [Deploying](#deploying)
 - [Logging](#logging)
 - [Dependencies](#dependencies)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Overview
 
