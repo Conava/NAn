@@ -6,6 +6,7 @@
     </envs>
     <module name="backend" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.cs250.nan.backend.BackendApplication" />
+    <option name="VM_PARAMETERS" value="-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
