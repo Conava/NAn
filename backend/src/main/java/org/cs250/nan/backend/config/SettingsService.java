@@ -1,6 +1,8 @@
 package org.cs250.nan.backend.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,31 +11,70 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Map;
 
 /**
- * Saves the current AppProperties back to the external application.yml
- * so that overrides survive restart.
+ * Persist the current AppProperties back to ${app.base-dir}/settings.yml
+ * in a form that Spring will re-import on startup.
  */
 @Service
 public class SettingsService {
-    private final ObjectMapper mapper;
+
+    private final ObjectMapper yamlMapper;
     private final Path externalFile;
 
-    public SettingsService(ObjectMapper mapper,
-                           @Value("${spring.config.location:file:${app.base-dir}/settings.yml}") String path) {
-        this.mapper = mapper;
-        this.externalFile = Paths.get(path.replaceFirst("^file:", ""));
+    public SettingsService(
+            @Value("${app.base-dir}") String baseDir
+    ) {
+        // 1) Create a YAML mapper that outputs kebab-case
+        this.yamlMapper = new ObjectMapper(new YAMLFactory())
+                .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
+                // 2) Make sure our AppProperties and its nested classes ignore Spring internals
+                .addMixIn(AppProperties.class, IgnoreSpringInternalMixIn.class)
+                .addMixIn(AppProperties.Db.class, IgnoreSpringInternalMixIn.class)
+                .addMixIn(AppProperties.Monitor.class, IgnoreSpringInternalMixIn.class);
+
+        // 3) Always write to settings.yml under the base-dir
+        this.externalFile = Paths.get(baseDir, "settings.yml");
     }
 
     /**
-     * now takes the caller’s copy, not the Spring bean
+     * Write out exactly:
+     *
+     * <pre>
+     * app:
+     *   base-dir: …
+     *   data-storage: …
+     *   …
+     *   db:
+     *     remote-enabled: …
+     *     remote-url: …
+     *   monitor:
+     *     scan-interval: …
+     *     …
+     * </pre>
      */
     public void saveExternalConfig(AppProperties snapshot) throws IOException {
-        // ensure dir
+        // Ensure the directory exists
         Files.createDirectories(externalFile.getParent());
-        // write out a nice YAML (or JSON) of exactly the fields on your snapshot:
-        mapper
+
+        // Wrap under “app:” so Spring will bind it to app.* on next startup
+        Map<String, AppProperties> root = Collections.singletonMap("app", snapshot);
+
+        yamlMapper
                 .writerWithDefaultPrettyPrinter()
-                .writeValue(externalFile.toFile(), snapshot);
+                .writeValue(externalFile.toFile(), root);
+    }
+
+    /**
+     * Mixin to drop any Spring/CGLIB internals from serialization.
+     */
+    @JsonIgnoreProperties({
+            "beanFactory",
+            "applicationContext",
+            "$$enhancerBySpringCGLIB"
+    })
+    private abstract static class IgnoreSpringInternalMixIn {
     }
 }

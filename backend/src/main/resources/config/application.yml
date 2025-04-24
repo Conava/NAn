@@ -30,10 +30,12 @@ app:
     kml-file-name: monitorKML
     csv-file-name: monitorCSV
 
-spring:
-  config:
-    name: settings
-    import: optional:file:${app.base-dir}/settings.yml
 logging:
   file:
     name: ${app.log-file}
+
+spring:
+  config:
+    import:
+      - optional:file:${user.home}/.config/NAn/settings.yml
+      - optional:file:${env:LOCALAPPDATA}/NAn/settings.yml

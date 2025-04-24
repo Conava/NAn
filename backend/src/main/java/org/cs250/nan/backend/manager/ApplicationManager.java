@@ -103,7 +103,7 @@ public class ApplicationManager {
 
         // db
         props.getDb().setRemoteEnabled(newProps.getDb().isRemoteEnabled());
-        props.getDb().setUri(newProps.getDb().getUri());
+        props.getDb().setRemoteUrl(newProps.getDb().getRemoteUrl());
 
         // monitor
         AppProperties.Monitor m = props.getMonitor();

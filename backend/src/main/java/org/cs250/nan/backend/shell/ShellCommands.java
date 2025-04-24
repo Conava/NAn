@@ -115,7 +115,7 @@ public class ShellCommands {
                 "log-file           : " + p.getLogFile(),
                 "",
                 "db.remote-enabled  : " + p.getDb().isRemoteEnabled(),
-                "db.remote-url      : " + p.getDb().getUri(),
+                "db.remote-url      : " + p.getDb().getRemoteUrl(),
                 "",
                 "monitor.interval   : " + p.getMonitor().getScanInterval(),
                 "monitor.gps-on     : " + p.getMonitor().isGpsOn(),
@@ -173,7 +173,7 @@ public class ShellCommands {
         p.setActivateGui(props.isActivateGui());
         p.setLogFile(props.getLogFile());
         p.getDb().setRemoteEnabled(props.getDb().isRemoteEnabled());
-        p.getDb().setUri(props.getDb().getUri());
+        p.getDb().setRemoteUrl(props.getDb().getRemoteUrl());
         var m = p.getMonitor();
         var b = props.getMonitor();
         m.setScanInterval(b.getScanInterval());
@@ -221,7 +221,7 @@ public class ShellCommands {
                         changed.add(k);
                     }
                     case "db.remote-url" -> {
-                        p.getDb().setUri(v);
+                        p.getDb().setRemoteUrl(v);
                         changed.add(k);
                     }
                     case "monitor.interval" -> {

@@ -158,7 +158,7 @@ public class ApiController {
         var db = p.getDb();
         var dbdto = dto.getDb();
         db.setRemoteEnabled(dbdto.getRemoteEnabled());
-        db.setUri(dbdto.getRemoteUrl());
+        db.setRemoteUrl(dbdto.getRemoteUrl());
 
         p.getMonitor().setScanInterval(dto.getMonitor().getScanInterval());
         p.getMonitor().setGpsOn(dto.getMonitor().getGpsOn());
@@ -182,7 +182,7 @@ public class ApiController {
 
         SettingsDTO.DbDTO dbdto = new SettingsDTO.DbDTO();
         dbdto.setRemoteEnabled(p.getDb().isRemoteEnabled());
-        dbdto.setRemoteUrl(p.getDb().getUri());
+        dbdto.setRemoteUrl(p.getDb().getRemoteUrl());
         dto.setDb(dbdto);
 
         MonitorConfigDTO mDto = new MonitorConfigDTO();

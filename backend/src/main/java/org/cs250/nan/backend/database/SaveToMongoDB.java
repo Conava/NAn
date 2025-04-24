@@ -22,7 +22,7 @@ public class SaveToMongoDB {
     public SaveToMongoDB(AppProperties props, MongoConnectionChecker checker) {
         this.remoteEnabled = props.getDb().isRemoteEnabled();
         if (remoteEnabled && checker.isConnected()) {
-            MongoClient client = MongoClients.create(props.getDb().getUri());
+            MongoClient client = MongoClients.create(props.getDb().getRemoteUrl());
             MongoDatabase db = client.getDatabase("mydb"); // adjust your DB name
             this.collection = db.getCollection("scans");
         } else {

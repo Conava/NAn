@@ -31,8 +31,8 @@ public class AppProperties {
     @Data
     public static class Db {
         /** If false, all Mongo logic is disabled at runtime. */
-        private boolean remoteEnabled = false;
+        private boolean remoteEnabled;
         /** Mongo URI when enabled */
-        private String uri;
+        private String remoteUrl;
     }
 }

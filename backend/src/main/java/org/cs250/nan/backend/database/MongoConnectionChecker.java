@@ -19,7 +19,7 @@ public class MongoConnectionChecker {
         this.remoteEnabled = props.getDb().isRemoteEnabled();
         if (remoteEnabled) {
             // create client once
-            this.client = MongoClients.create(props.getDb().getUri());
+            this.client = MongoClients.create(props.getDb().getRemoteUrl());
         } else {
             this.client = null;
         }
