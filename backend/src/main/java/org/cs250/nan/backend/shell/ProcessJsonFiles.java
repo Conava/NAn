@@ -20,9 +20,9 @@ public class ProcessJsonFiles {
             return;
         }
 
-        for (File jsonFile : jsonFiles) {
-            String path = jsonFile.getAbsolutePath();
-            FromFileSaveToMongoDB.fromFileSaveToMongoDB(path);
-        }
+//        for (File jsonFile : jsonFiles) {
+//            String path = jsonFile.getAbsolutePath();
+//            FromFileSaveToMongoDB.fromFileSaveToMongoDB(path);
+//        }
     }
 }
