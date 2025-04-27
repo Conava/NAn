@@ -7,21 +7,20 @@ import java.io.IOException;
 
 @Component
 public class SystemGPSScanner implements GPSScanner {
-    private final WindowsGPSScanner win;
+    private final WindowsGPSScanner windows;
     private final LinuxGPSScanner linux;
+    private final boolean isWindows;
 
-    public SystemGPSScanner(WindowsGPSScanner win, LinuxGPSScanner linux) {
-        this.win = win;
+    public SystemGPSScanner(WindowsGPSScanner windows, LinuxGPSScanner linux) {
+        this.windows = windows;
         this.linux = linux;
+        this.isWindows = System.getProperty("os.name").toLowerCase().contains("win");
     }
 
     @Override
     public JSONObject scan() throws IOException {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            return win.scan();
-        } else {
-            return linux.scan();
-        }
+        return isWindows
+                ? windows.scan()
+                : linux.scan();
     }
 }
