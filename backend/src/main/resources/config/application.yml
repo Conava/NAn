@@ -8,7 +8,7 @@ app:
 
   # ─── General settings ──────────────────────────────────────────────────
   data-storage: ${app.base-dir}/data
-  default-use-gps: true
+  use-gps: true
   keep-history: true
   activate-gui: true
   log-file: ${app.base-dir}/log.txt
@@ -21,7 +21,6 @@ app:
   # ─── Monitoring defaults ───────────────────────────────────────────────
   monitor:
     scan-interval: 60        # seconds
-    gps-on: true
     kml-output: true
     csv-output: false
 

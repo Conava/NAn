@@ -10,7 +10,7 @@ import lombok.Data;
 public class AppProperties {
     private String baseDir;
     private String dataStorage;
-    private boolean defaultUseGps;
+    private boolean useGps;
     private boolean keepHistory;
     private boolean activateGui;
     private String logFile;
@@ -20,7 +20,6 @@ public class AppProperties {
     @Data
     public static class Monitor {
         private int scanInterval;
-        private boolean gpsOn;
         private boolean kmlOutput;
         private boolean csvOutput;
         private String jsonFileName;
