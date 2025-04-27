@@ -1,65 +1,50 @@
 package org.cs250.nan.backend.scanner;
 
+import org.cs250.nan.backend.parser.LinuxWiFiDataParser;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Uses `iwlist <iface> scanning` under the hood.
+ */
 @Component
 public class LinuxWiFiScanner implements WiFiScanner {
-    private static final String FIELDS = "NAME,SSID,SSID-HEX,BSSID,MODE,CHAN,FREQ,RATE,BANDWIDTH,SIGNAL,BARS,SECURITY,WPA-FLAGS,RSN-FLAGS";
 
     @Override
     public List<JSONObject> scan() throws IOException {
-        return scan(null);
+        // 1) detect first wireless interface
+        String iface = detectWirelessInterface();
+        // 2) run scan
+        ProcessBuilder pb = new ProcessBuilder("bash", "-c",
+                "sudo iwlist " + iface + " scanning");
+        Process p = pb.start();
+
+        StringBuilder out = new StringBuilder();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                out.append(line).append("\n");
+            }
+        }
+        // 3) hand off to parser
+        return LinuxWiFiDataParser.parseStringToListOfJSON(out.toString());
     }
 
-    public List<JSONObject> scan(String interfaceName) throws IOException {
-        runCommand("nmcli device wifi rescan");
-        String cmd = "nmcli -t -f " + FIELDS + " device wifi list"
-                + (interfaceName != null && !interfaceName.isBlank()
-                ? " ifname " + interfaceName
-                : "");
-        String output = runCommand(cmd);
-
-        if (output.isBlank()) {
-            System.out.println("No output; ensure Wi‑Fi is enabled.");
-            return List.of();
-        }
-
-        return org.cs250.nan.backend.parser.WiFiDataParser
-                .parseStringToListOfJSON(output);
-    }
-
-    private String runCommand(String command) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder("bash", "-c", command);
-        Process process = pb.start();
-
-        String stdout = readStream(process.getInputStream());
-        String stderr = readStream(process.getErrorStream());
-        int exitCode;
-        try {
-            exitCode = process.waitFor();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Command interrupted: " + command, e);
-        }
-
-        if (exitCode != 0) {
-            System.err.println("Command failed: " + stderr);
-        }
-
-        return stdout;
-    }
-
-    private String readStream(InputStream is) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+    private String detectWirelessInterface() throws IOException {
+        ProcessBuilder pb = new ProcessBuilder("bash", "-c",
+                "iw dev | awk '$1==\"Interface\" {print $2; exit}'");
+        Process p = pb.start();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            String iface = r.readLine();
+            if (iface == null || iface.isBlank()) {
+                throw new IOException("No wireless interface found");
+            }
+            return iface.trim();
         }
     }
 }
