@@ -150,7 +150,6 @@ public class ApiController {
         AppProperties p = new AppProperties();
         p.setBaseDir(dto.getBaseDir());
         p.setDataStorage(dto.getDataStorage());
-        p.setDefaultUseGps(dto.getDefaultUseGps());
         p.setKeepHistory(dto.getKeepHistory());
         p.setActivateGui(dto.getActivateGui());
         p.setLogFile(dto.getLogFile());
@@ -175,7 +174,6 @@ public class ApiController {
         SettingsDTO dto = new SettingsDTO();
         dto.setBaseDir(p.getBaseDir());
         dto.setDataStorage(p.getDataStorage());
-        dto.setDefaultUseGps(p.isDefaultUseGps());
         dto.setKeepHistory(p.isKeepHistory());
         dto.setActivateGui(p.isActivateGui());
         dto.setLogFile(p.getLogFile());

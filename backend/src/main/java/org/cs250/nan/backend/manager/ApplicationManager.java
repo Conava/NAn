@@ -96,7 +96,6 @@ public class ApplicationManager {
         // copy top-level
         props.setBaseDir(newProps.getBaseDir());
         props.setDataStorage(newProps.getDataStorage());
-        props.setDefaultUseGps(newProps.isDefaultUseGps());
         props.setKeepHistory(newProps.isKeepHistory());
         props.setActivateGui(newProps.isActivateGui());
         props.setLogFile(newProps.getLogFile());
@@ -139,6 +138,7 @@ public class ApplicationManager {
      */
     public CompletableFuture<String> runSingleScan(AppProperties.Monitor overrideCfg) {
         var cfg = overrideCfg != null ? overrideCfg : props.getMonitor();
+        System.out.println(props.getMonitor());
         System.out.println("Running single scan…");
 
         return singleScanService.run(cfg)

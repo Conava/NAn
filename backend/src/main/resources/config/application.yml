@@ -8,7 +8,6 @@ app:
 
   # ─── General settings ──────────────────────────────────────────────────
   data-storage: ${app.base-dir}/data
-  use-gps: true
   keep-history: true
   activate-gui: true
   log-file: ${app.base-dir}/log.txt
@@ -23,6 +22,7 @@ app:
     scan-interval: 60        # seconds
     kml-output: true
     csv-output: false
+    gps-on: true
 
     # filenames only (your code can prefix them with data-storage or base-dir)
     json-file-name: monitorJson

@@ -109,7 +109,6 @@ public class ShellCommands {
         List<String> rows = List.of(
                 "base-dir           : " + p.getBaseDir(),
                 "data-storage       : " + p.getDataStorage(),
-                "default-use-gps    : " + p.isDefaultUseGps(),
                 "keep-history       : " + p.isKeepHistory(),
                 "activate-gui       : " + p.isActivateGui(),
                 "log-file           : " + p.getLogFile(),
@@ -168,7 +167,6 @@ public class ShellCommands {
         // copy existing
         p.setBaseDir(props.getBaseDir());
         p.setDataStorage(props.getDataStorage());
-        p.setDefaultUseGps(props.isDefaultUseGps());
         p.setKeepHistory(props.isKeepHistory());
         p.setActivateGui(props.isActivateGui());
         p.setLogFile(props.getLogFile());
@@ -198,10 +196,6 @@ public class ShellCommands {
                     }
                     case "data-storage" -> {
                         p.setDataStorage(v);
-                        changed.add(k);
-                    }
-                    case "default-use-gps" -> {
-                        p.setDefaultUseGps(Boolean.parseBoolean(v));
                         changed.add(k);
                     }
                     case "keep-history" -> {
