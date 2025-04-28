@@ -1,6 +1,7 @@
 <template>
   <div class="p-4">
     <h1>Network Analyzer GUI</h1>
+
     <button @click="runScan">Run Scan</button>
 
     <h2>Scan Results</h2>
@@ -16,6 +17,7 @@
       </tr>
       </tbody>
     </table>
+
     <p v-else>No data yet.</p>
   </div>
 </template>
@@ -28,11 +30,23 @@ const results = ref<any[]>([])
 
 async function runScan() {
   try {
-    await axios.get('http://localhost:8080/api/scan') // Start scan
-    const res = await axios.get('http://localhost:8080/api/monitor/data') // Get results
-    results.value = res.data
+    console.log("Starting scan...");
+
+    // Call /api/scan to trigger a scan
+    await axios.get('http://localhost:8080/api/scan', {
+      withCredentials: true
+    });
+
+    // Then fetch the monitoring data
+    const res = await axios.get('http://localhost:8080/api/monitor/data', {
+      withCredentials: true
+    });
+
+    results.value = res.data;
+    console.log("Scan complete:", res.data);
+
   } catch (err) {
-    console.error('Scan failed:', err)
+    console.error('Scan failed:', err);
   }
 }
 </script>
