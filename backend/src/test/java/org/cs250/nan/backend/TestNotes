@@ -1,0 +1,28 @@
+Little note for Tests
+
+ReadMe: api folder
+API Testing is being done on Insomnia
+Link:
+https://insomnia.rest/
+Must download in order to test API
+
+Current:
+GPSDataParser
+
+TODO:
+Basic test setup - done
+Add all the method tests
+    config - done
+    database - done
+    manager - done
+    parser -done
+    scanner - done
+    service - WIP
+    shell - done
+
+
+Notes:
+
+Method notes:
+SettingsServe - com.fasterxml.jackson.dataformat.yaml.YAMLFactory is missing, look back into it
+parsers - no handle of missing info
