@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class MongoRetriever {
@@ -46,12 +47,21 @@ public class MongoRetriever {
     }
 
     public static void main(String[] args) throws IOException {
-        MongoConnectionManager.initialize(
-                "mongodb+srv://mleavitt1457:paPq1zK5gmrdk7rT@cs250-nan.2finb.mongodb.net/?retryWrites=true&w=majority&appName=CS250-NAn",
-                "wifiData"
-        );
+//        // Create a Scanner object for reading input
+//        Scanner scanner = new Scanner(System.in);
+//        // Prompt user for the first string
+//        System.out.print("Enter the key (ex: sessionID): ");
+//        String key = scanner.nextLine();
+//        // Prompt user for the second string
+//        System.out.print("Enter the value/value fragment (ex: YYMMDDHHMM [as numbers]): ");
+//        String value = scanner.nextLine();
 
-        List<JSONObject> matches = MongoRetriever.getDocumentsByKeyValueContains("sessionID", "25042515");
+        MongoConnectionManager.initialize("mongodb+srv://mleavitt1457:paPq1zK5gmrdk7rT@cs250-nan.2finb.mongodb.net/?retryWrites=true&w=majority&appName=CS250-NAn", "wifiData");
+
+        String key = "sessionID";
+        String value = "250425151755";
+
+        List<JSONObject> matches = MongoRetriever.getDocumentsByKeyValueContains(key, value);
 
         GenerateUIcsv.generateUIcsv(matches, "csvForUI");
 
