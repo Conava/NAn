@@ -1,5 +1,6 @@
 package org.cs250.nan.backend;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cs250.nan.backend.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

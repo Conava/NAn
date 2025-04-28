@@ -1,11 +1,13 @@
 package org.cs250.nan.backend.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import lombok.Data;
 
+/**
+ * Application‑level configuration properties under prefix `app`.
+ * Immutable, validated and bound via constructor.
+ */
 @Data
-@Configuration
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private String baseDir;
@@ -27,6 +29,9 @@ public class AppProperties {
         private String csvFileName;
     }
 
+    /**
+     * Database connectivity settings.
+     */
     @Data
     public static class Db {
         /** If false, all Mongo logic is disabled at runtime. */
