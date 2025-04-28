@@ -49,11 +49,25 @@ and analysis. It offers:
    cd NAn
    ```
 2. **Verify Java & Maven**
+Java and Maven versions should be 23+ and 3.6+ respectively.  
    ```bash  
    java -version  
    mvn -v
    ```
 3. **Optional**: Import as Maven project in your IDE.
+
+4. **Prerequisites**: 
+    - **Linux/macOS**: 
+      - Ensure you have `iw` and `gpsd` installed.
+      - Enable sudo-less `iw` access:
+        ```bash  
+        sudo setcap cap_net_admin+ep $(which iw)
+        ```
+    - **Windows**: Ensure you have `netsh` and `gpsd` installed.
+
+5. **MongoDB** (optional)
+   - Install MongoDB locally or use a remote instance.
+   - Ensure MongoDB is running if using local storage.
 
 ## Configuration
 
