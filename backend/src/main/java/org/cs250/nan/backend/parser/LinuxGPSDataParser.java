@@ -1,6 +1,7 @@
 package org.cs250.nan.backend.parser;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
  * Parses raw NMEA sentences into a JSON object,
  * exactly as ParseGPSDataWindows did.
  */
+@Component
 public class LinuxGPSDataParser {
 
     private final Map<String,String[]> dataLabels;
@@ -46,6 +48,7 @@ public class LinuxGPSDataParser {
                 map.put(labels[i], parts[i+1]);
             }
         }
+        System.out.println("Parsed GPS data: " + map);
         return new JSONObject(map);
     }
 }

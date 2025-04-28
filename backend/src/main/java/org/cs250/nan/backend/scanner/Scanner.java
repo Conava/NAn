@@ -52,10 +52,12 @@ public class Scanner {
                                  String kmlFileName,
                                  String csvFileName) throws IOException {
         // 1) Wi-Fi
+        System.out.println("Running Wi-Fi scan...");
         var wifiList = wifi.scan();
 
         // 2) GPS
         List<JSONObject> merged;
+        System.out.println("GPS is " + (gpsOn ? "enabled, running GPS scan" : "disabled"));
         if (gpsOn) {
             var gpsObj = gps.scan();
             merged = mergeService.mergeJSONObjects(wifiList, gpsObj);

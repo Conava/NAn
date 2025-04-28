@@ -1,6 +1,7 @@
 package org.cs250.nan.backend.parser;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,82 +10,93 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Parses the output of `iwlist <iface> scanning` into the same keys your Windows parser produced.
- */
+@Component
 public class LinuxWiFiDataParser {
-    private static final Pattern CELL = Pattern.compile("^\\s*Cell \\d+ - Address: ([0-9A-F:]{17})", Pattern.CASE_INSENSITIVE);
-    private static final Pattern ESSID = Pattern.compile("ESSID:\"(.*)\"");
-    private static final Pattern SIGNAL = Pattern.compile("Signal level=(-?\\d+\\s?dBm)");
-    private static final Pattern FREQ  = Pattern.compile("Frequency:(\\d+\\.\\d+) GHz");
-    private static final Pattern PROTO = Pattern.compile("Protocol:(.*)");
-    private static final Pattern ENC   = Pattern.compile("Encryption key:(on|off)");
-    private static final Pattern IE_WPA   = Pattern.compile("IE: WPA Version.*");
-    private static final Pattern IE_RSN   = Pattern.compile("IE: RSN Version.*");
 
-    public static List<JSONObject> parseStringToListOfJSON(String scanOutput) {
-        List<JSONObject> list = new ArrayList<>();
-        String[] blocks = scanOutput.split("(?m)(?=\\s*Cell \\d+ - Address:)");
+    // match the “BSS xx:xx:xx…” line
+    private static final Pattern BSS_HEADER = Pattern.compile(
+            "^BSS\\s+([0-9a-f:]{17})", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+    );
+    private static final Pattern SSID_PAT = Pattern.compile("^\\s*SSID:\\s*(.*)$");
+    private static final Pattern SIGNAL_PAT = Pattern.compile("^\\s*signal:\\s*([-0-9.]+) dBm");
+    private static final Pattern FREQ_PAT = Pattern.compile("^\\s*freq:\\s*([0-9.]+)");
+    private static final Pattern RSN_GROUP = Pattern.compile("\\* Group cipher:\\s*(\\S+)");
+    private static final Pattern RSN_AUTH = Pattern.compile("\\* Authentication suites:\\s*(\\S+)");
+
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmmss.SSS");
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("ddMMyy");
+
+    /**
+     * Split raw “iw scan” output on each “BSS …” header, then pull out
+     * exactly the same keys your Windows parser emits.
+     */
+    public List<JSONObject> parseStringToListOfJSON(String raw) {
+        List<JSONObject> results = new ArrayList<>();
+        if (raw == null || raw.isBlank()) return results;
+
+        // split out each BSS block
+        String[] blocks = raw.split("(?m)(?=^BSS )");
 
         for (String block : blocks) {
-            Map<String,String> m = new HashMap<>();
-            String ssid = "";
-            String auth = "";
-            String encr = "";
-
             String[] lines = block.split("\\r?\\n");
+            Matcher header = BSS_HEADER.matcher(lines[0]);
+            if (!header.find()) continue;
+
+            // we’ll keep insertion order so the JSON keys line up nicely
+            Map<String, String> map = new LinkedHashMap<>();
+            map.put("MAC", header.group(1));
+            map.put("SSID", "");
+            map.put("Authentication", "");
+            map.put("Encryption", "");
+            map.put("timeLocal", LocalTime.now().format(TIME_FMT));
+            map.put("dateLocal", LocalDate.now().format(DATE_FMT));
+
+            String foundCipher = null, foundAuth = null;
+
             for (String line : lines) {
-                Matcher c = CELL.matcher(line);
-                if (c.find()) {
-                    m.put("MAC", c.group(1).trim());
+                Matcher m;
+
+                if ((m = SSID_PAT.matcher(line)).find()) {
+                    map.put("SSID", m.group(1).trim());
                     continue;
                 }
-                Matcher e = ESSID.matcher(line);
-                if (e.find()) {
-                    ssid = e.group(1);
+                if ((m = SIGNAL_PAT.matcher(line)).find()) {
+                    // match Windows’ Value + “ dBm”
+                    map.put("Signal", m.group(1).trim() + " dBm");
                     continue;
                 }
-                Matcher p = PROTO.matcher(line);
-                if (p.find()) {
-                    m.put("Radio type", p.group(1).trim());
+                if ((m = FREQ_PAT.matcher(line)).find()) {
+                    double freq = Double.parseDouble(m.group(1));
+                    map.put("Band", freq < 2500 ? "2.4 GHz" : "5 GHz");
                     continue;
                 }
-                Matcher f = FREQ.matcher(line);
-                if (f.find()) {
-                    double ghz = Double.parseDouble(f.group(1));
-                    m.put("Band", ghz < 3 ? "2.4 GHz" : "5 GHz");
+                if ((m = RSN_GROUP.matcher(line)).find()) {
+                    foundCipher = m.group(1).trim();
                     continue;
                 }
-                Matcher s = SIGNAL.matcher(line);
-                if (s.find()) {
-                    m.put("Signal", s.group(1).trim());
+                if ((m = RSN_AUTH.matcher(line)).find()) {
+                    foundAuth = m.group(1).trim();
                     continue;
                 }
-                Matcher enc = ENC.matcher(line);
-                if (enc.find()) {
-                    encr = enc.group(1).equals("on") ? "Yes" : "No";
-                    continue;
-                }
-                if (IE_WPA.matcher(line).find()) {
-                    auth = auth.isEmpty() ? "WPA" : auth + "/WPA";
-                    continue;
-                }
-                if (IE_RSN.matcher(line).find()) {
-                    auth = auth.isEmpty() ? "WPA2" : auth + "/WPA2";
+
+                // any other “Key: Value” lines get copied verbatim
+                String trimmed = line.trim();
+                if (trimmed.contains(":")) {
+                    String[] parts = trimmed.split(":", 2);
+                    String key = parts[0].trim(), val = parts[1].trim();
+                    if (!key.isEmpty() && !val.isEmpty()) {
+                        map.put(key, val);
+                    }
                 }
             }
 
-            // put the collected SSID/auth/encryption
-            m.put("SSID", ssid);
-            m.put("Authentication", auth);
-            m.put("Encryption", encr);
+            // finalize the RSN fields
+            if (foundCipher != null) map.put("Encryption", foundCipher);
+            if (foundAuth != null) map.put("Authentication", foundAuth);
 
-            // timestamps
-            m.put("timeLocal", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss.SSS")));
-            m.put("dateLocal", LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")));
-
-            list.add(new JSONObject(m));
+            results.add(new JSONObject(map));
         }
-        return list;
+
+        return results;
     }
 }

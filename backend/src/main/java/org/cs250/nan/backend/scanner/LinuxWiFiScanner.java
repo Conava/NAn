@@ -2,49 +2,49 @@ package org.cs250.nan.backend.scanner;
 
 import org.cs250.nan.backend.parser.LinuxWiFiDataParser;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Uses `iwlist <iface> scanning` under the hood.
- */
 @Component
 public class LinuxWiFiScanner implements WiFiScanner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinuxWiFiScanner.class);
+    private final String iface;
+    private final LinuxWiFiDataParser parser;
+
+    public LinuxWiFiScanner(@Value("${app.wifi-interface:wlan0}") String iface,
+                            LinuxWiFiDataParser parser) {
+        this.iface = iface;
+        this.parser = parser;
+    }
 
     @Override
     public List<JSONObject> scan() throws IOException {
-        // 1) detect first wireless interface
-        String iface = detectWirelessInterface();
-        // 2) run scan
-        ProcessBuilder pb = new ProcessBuilder("bash", "-c",
-                "sudo iwlist " + iface + " scanning");
-        Process p = pb.start();
+        // run “iw dev <iface> scan”
+        ProcessBuilder pb = new ProcessBuilder("iw", "dev", iface, "scan");
+        pb.redirectErrorStream(true);                     // <- merge stderr into stdout
+        Process proc = pb.start();
 
-        StringBuilder out = new StringBuilder();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-            String line;
-            while ((line = r.readLine()) != null) {
-                out.append(line).append("\n");
-            }
-        }
-        // 3) hand off to parser
-        return LinuxWiFiDataParser.parseStringToListOfJSON(out.toString());
-    }
+        String raw = new BufferedReader(new InputStreamReader(proc.getInputStream()))
+                .lines()
+                .collect(Collectors.joining("\n"));
 
-    private String detectWirelessInterface() throws IOException {
-        ProcessBuilder pb = new ProcessBuilder("bash", "-c",
-                "iw dev | awk '$1==\"Interface\" {print $2; exit}'");
-        Process p = pb.start();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-            String iface = r.readLine();
-            if (iface == null || iface.isBlank()) {
-                throw new IOException("No wireless interface found");
-            }
-            return iface.trim();
+        int exit = 0;                       // <- waitFor so you can inspect exit code
+        try {
+            exit = proc.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+        LOGGER.error(">>> iw scan exit={}", exit);
+
+        // hand it off to our parser
+        return parser.parseStringToListOfJSON(raw);
     }
 }
