@@ -1,59 +1,98 @@
 <template>
-  <div class="p-4">
+  <div class="p-4 min-h-screen">
+    <!-- Search Bar (fixed top-right, only after scan) -->
+    <input
+        v-if="hasScanned && !showSettings"
+        v-model="searchTerm"
+        type="text"
+        placeholder="Search networks…"
+        class="fixed top-4 right-4 border rounded p-2 w-64 z-50"
+    />
+
     <!-- Home / Scan Screen -->
     <div v-if="!showSettings">
       <h1 class="text-2xl font-bold mb-4">Network Analyzer</h1>
 
-      <!-- Scan Controls -->
-      <button
-          @click="runScan"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-      >
-        Run Scan
-      </button>
-
-      <!-- Scan Results -->
-      <h2 class="mt-6 text-xl font-semibold">Scan Results</h2>
-      <table
-          v-if="results.length"
-          class="w-full mt-2 table-auto border-collapse"
-      >
-        <thead>
-        <tr class="bg-gray-100">
-          <th
-              v-for="col in columns"
-              :key="col"
-              class="px-3 py-1 text-left border-b"
-          >
-            {{ col }}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr
-            v-for="(row, rowIndex) in results"
-            :key="rowIndex"
-            class="odd:bg-white even:bg-gray-50"
+      <!-- Buttons Row -->
+      <div class="flex items-center mb-4">
+        <button
+            @click="runScan"
+            :disabled="isLoading"
+            class="mr-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
         >
-          <td
-              v-for="col in columns"
-              :key="col"
-              class="px-3 py-1 border-b"
-          >
-            {{ row[col] }}
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <p v-else class="mt-2 text-gray-500">No data yet.</p>
+          Run Scan
+        </button>
+        <button
+            @click="showSettings = true"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Settings
+        </button>
+      </div>
 
-      <!-- Go to Settings Screen -->
-      <button
-          @click="showSettings = true"
-          class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Settings
-      </button>
+      <!-- Loading Spinner (very small ~1.6px) -->
+      <div v-if="isLoading" class="flex justify-center mt-10 mb-4">
+        <svg
+            class="animate-spin text-green-600"
+            style="width:25px; height:25px;"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+        >
+          <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+          />
+          <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8z"
+          />
+        </svg>
+      </div>
+
+      <!-- Scan Results (only after first scan) -->
+      <div v-if="hasScanned">
+        <h2 class="text-xl font-semibold mb-2">Scan Results</h2>
+
+        <table
+            v-if="filteredResults.length"
+            class="w-full table-auto border-collapse"
+        >
+          <thead>
+          <tr class="bg-gray-100">
+            <th
+                v-for="col in columns"
+                :key="col"
+                class="px-3 py-1 text-left border-b"
+            >
+              {{ col }}
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+              v-for="(row, rowIndex) in filteredResults"
+              :key="rowIndex"
+              class="odd:bg-white even:bg-gray-50"
+          >
+            <td
+                v-for="col in columns"
+                :key="col"
+                class="px-3 py-1 border-b"
+            >
+              {{ row[col] }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <p v-else class="text-gray-500">No matching networks.</p>
+      </div>
     </div>
 
     <!-- Settings “Page” -->
@@ -73,37 +112,48 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 import SettingsPanel from './components/SettingsPanel.vue'
 
 const showSettings = ref(false)
-
-// **NEW**: results + columns for dynamic JSON table
 const results = ref<Record<string, any>[]>([])
 const columns = ref<string[]>([])
 
+// Track whether we've run at least one scan
+const hasScanned = ref(false)
+// Loading state
+const isLoading = ref(false)
+
+// Search term and filtered results
+const searchTerm = ref('')
+const filteredResults = computed(() => {
+  if (!searchTerm.value) return results.value
+  const term = searchTerm.value.toLowerCase()
+  return results.value.filter(row =>
+      Object.values(row).some(
+          val => typeof val === 'string' && val.toLowerCase().includes(term)
+      )
+  )
+})
+
 async function runScan() {
   try {
-    // 1) Trigger the one‐off scan
-    await axios.get('http://localhost:8080/api/scan', {
-      withCredentials: true
-    })
-
-    // 2) Fetch the new data from the JSON file via your API
+    isLoading.value = true
+    // Trigger scan
+    await axios.get('http://localhost:8080/api/scan', { withCredentials: true })
+    // Fetch table data
     const res = await axios.get<Record<string, any>[]>(
         'http://localhost:8080/api/monitor/data',
         { withCredentials: true }
     )
-
-    // 3) Store rows and derive column headers
     results.value = res.data
-    columns.value = res.data.length
-        ? Object.keys(res.data[0])
-        : []
-
+    columns.value = res.data.length ? Object.keys(res.data[0]) : []
+    hasScanned.value = true
   } catch (err) {
     console.error('Scan failed:', err)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
