@@ -1,6 +1,5 @@
 <template>
   <div class="p-4 max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Application Settings</h1>
     <form @submit.prevent="saveSettings" class="space-y-4">
       <!-- Base Directory -->
       <div>

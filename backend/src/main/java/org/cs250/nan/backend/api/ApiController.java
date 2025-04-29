@@ -11,6 +11,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @RestController
 @RequestMapping("/api")
@@ -68,12 +79,27 @@ public class ApiController {
     // ─── Monitoring Data & Export ────────────────────────────────────────────
 
     @GetMapping("/monitor/data")
-    public ResponseEntity<List<Object>> getMonitoringData() {
-        List<Object> raw = appMgr.getMonitoringData()
-                .stream()
-                .map(JSONObject::toMap)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(raw);
+    public ResponseEntity<List<Map<String, Object>>> getMonitoringData() throws IOException {
+        // 1) Locate your data folder
+        Path dir = Paths.get(props.getDataStorage());
+
+        // 2) Find the most‐recent JSON file ending in "_<jsonFileName>.json"
+        String suffix = "_" + props.getMonitor().getJsonFileName() + ".json";
+        try (Stream<Path> files = Files.list(dir)) {
+            Path latest = files
+                    .filter(p -> p.getFileName().toString().endsWith(suffix))
+                    .max(Comparator.comparingLong(p -> p.toFile().lastModified()))
+                    .orElseThrow(() -> new FileNotFoundException("No scan JSON found"));
+
+            // 3) Parse that file into a List of Maps
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String,Object>> data = mapper.readValue(
+                    latest.toFile(),
+                    new TypeReference<List<Map<String,Object>>>() {}
+            );
+
+            return ResponseEntity.ok(data);
+        }
     }
 
     @GetMapping("/monitor/export")
