@@ -43,8 +43,8 @@ public class WindowsWiFiDataParser {
                 currentMap.put("SSID", ssid);
                 currentMap.put("Authentication", auth);
                 currentMap.put("Encryption", encryp);
-                currentMap.put("timeLocal", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss.SSS")));
-                currentMap.put("dateLocal", LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")));
+                currentMap.put("timeLocal", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
+                currentMap.put("dateLocal", LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")));
 
             } else {
                 if (currentMap != null) {
