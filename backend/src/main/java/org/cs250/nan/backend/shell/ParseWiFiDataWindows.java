@@ -83,11 +83,11 @@ public class ParseWiFiDataWindows {
                 currentMap.put("Encryption", encryp);
 
                 // Get the local time in "HHmmss.SSS" format
-                String timeFormatted = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss.SSS"));
+                String timeFormatted = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
                 currentMap.put("timeLocal", timeFormatted);
 
                 // Get the local date in "ddMMyy" format
-                String dateFormatted = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy"));
+                String dateFormatted = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
                 currentMap.put("dateLocal", dateFormatted);
 
             }
