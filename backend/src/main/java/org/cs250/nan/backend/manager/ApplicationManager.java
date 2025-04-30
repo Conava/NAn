@@ -3,6 +3,7 @@ package org.cs250.nan.backend.manager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cs250.nan.backend.config.AppProperties;
 import org.cs250.nan.backend.config.SettingsService;
+import org.cs250.nan.backend.database.MongoRetriever;
 import org.cs250.nan.backend.service.JsonWriterService;
 import org.cs250.nan.backend.service.MonitoringManager;
 import org.cs250.nan.backend.service.SingleScanService;
@@ -35,6 +36,7 @@ public class ApplicationManager {
     private final AppProperties props;
     private final SettingsService settingsService;
     private final ConfigurableApplicationContext context;
+    private final MongoRetriever mongoRetriever;
 
     private final AtomicLong lastScanTime = new AtomicLong(0);
     private final AtomicInteger lastResultCount = new AtomicInteger(0);
@@ -44,13 +46,15 @@ public class ApplicationManager {
                               JsonWriterService jsonWriterService,
                               AppProperties props,
                               SettingsService settingsService,
-                              ConfigurableApplicationContext context) {
+                              ConfigurableApplicationContext context,
+                              MongoRetriever mongoRetriever) {
         this.monitoringManager = monitoringManager;
         this.singleScanService = singleScanService;
         this.jsonWriterService = jsonWriterService;
         this.props = props;
         this.settingsService = settingsService;
         this.context = context;
+        this.mongoRetriever = mongoRetriever;
     }
 
     /**
@@ -190,4 +194,9 @@ public class ApplicationManager {
             int lastScanResultCount
     ) {
     }
+
+    public List<JSONObject> runMongoSearch() {
+        return mongoRetriever.getDocumentsByKeyValueContains("", ""); // empty for Scanner input
+    }
+
 }
