@@ -82,6 +82,19 @@ public class ApiController {
         return ResponseEntity.ok(appMgr.exportMonitoringData(fileName));
     }
 
+    // ─── MongoDB Query ──────────────────────────────────────────────────────
+
+    @GetMapping("/mongo/search")
+    public ResponseEntity<List<Object>> searchMongo() {
+        List<JSONObject> raw = appMgr.runMongoSearch();
+        List<Object> mapped = raw.stream()
+                .map(JSONObject::toMap)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(mapped);
+    }
+
+
     // ─── Application State ──────────────────────────────────────────────────
 
     @GetMapping("/state")
