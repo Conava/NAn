@@ -1,7 +1,9 @@
 package org.cs250.nan.backend.shell;
 
 import org.cs250.nan.backend.config.AppProperties;
+import org.cs250.nan.backend.database.MongoRetrievalResults;
 import org.cs250.nan.backend.manager.ApplicationManager;
+import org.json.JSONObject;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 public class ShellCommands {
     private final ApplicationManager appMgr;
     private final AppProperties props;
+    private MongoRetrievalResults mongoRetrievalResults;
 
     public ShellCommands(ApplicationManager appMgr, AppProperties props) {
         this.appMgr = appMgr;
@@ -258,4 +261,31 @@ public class ShellCommands {
         String result = appMgr.updateSettings(p);
         return "Updated [" + String.join(", ", changed) + "] → " + result;
     }
+
+    @ShellMethod(value = "Search MongoDB by key-value and return matching entries", key = "mongo retrieve")
+    public String searchMongo() {
+        // Get the search results
+        List<JSONObject> results = appMgr.runMongoSearch();
+
+        // Store the results in a new MongoSearchResults instance
+        mongoRetrievalResults = new MongoRetrievalResults(results, "", "");
+
+        return "Found " + results.size() + " matching entries.";
+    }
+
+    @ShellMethod(value = "Show previously fetched MongoDB results", key = "mongo show")
+    public MongoRetrievalResults showMongoResults() {
+        if (mongoRetrievalResults == null || mongoRetrievalResults.getResults().isEmpty()) {
+            System.out.println("No MongoDB results found.");
+            return new MongoRetrievalResults(List.of(), "", ""); // Return an empty result if no data is found
+        }
+
+        // Print each JSON object from the results
+        for (JSONObject json : mongoRetrievalResults.getResults()) {
+            System.out.println(json.toString(4)); // Pretty-print each JSON object
+        }
+
+        return mongoRetrievalResults; // Return the results object
+    }
+
 }
