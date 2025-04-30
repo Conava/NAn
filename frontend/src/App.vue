@@ -5,7 +5,7 @@
         v-if="hasScanned && !showSettings"
         v-model="searchTerm"
         type="text"
-        placeholder="Search networks…"
+        placeholder="Filter results…"
         class="fixed top-4 right-4 border rounded p-2 w-64 z-50"
     />
 
@@ -13,7 +13,7 @@
     <div v-if="!showSettings">
       <h1 class="text-2xl font-bold mb-4">Network Analyzer</h1>
 
-      <!-- Buttons Row -->
+      <!-- Buttons Row: Run Scan, Settings -->
       <div class="flex items-center mb-4">
         <button
             @click="runScan"
@@ -30,11 +30,28 @@
         </button>
       </div>
 
-      <!-- Loading Spinner (very small ~1.6px) -->
-      <div v-if="isLoading" class="flex justify-center mt-10 mb-4">
+      <!-- DB Search Row -->
+      <div class="flex items-center mb-4">
+        <input
+            v-model="dbQuery"
+            type="text"
+            placeholder="Search database…"
+            class="mr-2 border rounded p-2 w-64"
+        />
+        <button
+            @click="searchDb"
+            :disabled="isLoading"
+            class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+        >
+          Search DB
+        </button>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div v-if="isLoading" class="flex justify-center mt-6 mb-4">
         <svg
             class="animate-spin text-green-600"
-            style="width:25px; height:25px;"
+            style="width:1.6px; height:1.6px;"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -55,7 +72,7 @@
         </svg>
       </div>
 
-      <!-- Scan Results (only after first scan) -->
+      <!-- Scan / Search Results -->
       <div v-if="hasScanned">
         <h2 class="text-xl font-semibold mb-2">Scan Results</h2>
 
@@ -90,7 +107,6 @@
           </tr>
           </tbody>
         </table>
-
         <p v-else class="text-gray-500">No matching networks.</p>
       </div>
     </div>
@@ -120,12 +136,11 @@ const showSettings = ref(false)
 const results = ref<Record<string, any>[]>([])
 const columns = ref<string[]>([])
 
-// Track whether we've run at least one scan
+// Flags
 const hasScanned = ref(false)
-// Loading state
 const isLoading = ref(false)
 
-// Search term and filtered results
+// Local client filter
 const searchTerm = ref('')
 const filteredResults = computed(() => {
   if (!searchTerm.value) return results.value
@@ -137,12 +152,13 @@ const filteredResults = computed(() => {
   )
 })
 
+// DB query term
+const dbQuery = ref('')
+
 async function runScan() {
   try {
     isLoading.value = true
-    // Trigger scan
     await axios.get('http://localhost:8080/api/scan', { withCredentials: true })
-    // Fetch table data
     const res = await axios.get<Record<string, any>[]>(
         'http://localhost:8080/api/monitor/data',
         { withCredentials: true }
@@ -152,6 +168,26 @@ async function runScan() {
     hasScanned.value = true
   } catch (err) {
     console.error('Scan failed:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function searchDb() {
+  try {
+    isLoading.value = true
+    const res = await axios.get<Record<string, any>[]>(
+        'http://localhost:8080/api/mongo/search',
+        {
+          params: { q: dbQuery.value },
+          withCredentials: true
+        }
+    )
+    results.value = res.data
+    columns.value = res.data.length ? Object.keys(res.data[0]) : []
+    hasScanned.value = true
+  } catch (err) {
+    console.error('DB search failed:', err)
   } finally {
     isLoading.value = false
   }
