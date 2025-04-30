@@ -66,10 +66,14 @@ public class Scanner {
         }
 
         // 3) Persist or buffer
-        if (mongoChecker.isConnected()) {
-            merged.forEach(mongoSaver::insertJSONObject);
-        } else {
-            jsonWriter.writeJsonFile(merged, "ScanPendingUpload");
+        if (mongoChecker.remoteEnabled) {
+            if (mongoChecker.isConnected()) {
+                merged.forEach(mongoSaver::insertJSONObject);
+                System.out.println("Database updated.");
+            } else {
+                jsonWriter.writeJsonFile(merged, "ScanPendingUpload");
+                System.out.println("Data not sent to database, stored locally as \"ScanPendingUpload\".");
+            }
         }
 
         // 4) File outputs
