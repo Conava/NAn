@@ -14,15 +14,15 @@ app:
 
   # ─── Database settings ─────────────────────────────────────────────────
   db:
-    remote-enabled: false
-    remote-url: mongodb://localhost
+    remote-enabled: true
+    remote-url: mongodb+srv://mleavitt1457:paPq1zK5gmrdk7rT@cs250-nan.2finb.mongodb.net/?retryWrites=true&w=majority&appName=CS250-NAn
 
   # ─── Monitoring defaults ───────────────────────────────────────────────
   monitor:
     scan-interval: 60        # seconds
     kml-output: true
     csv-output: false
-    gps-on: true
+    gps-on: false
 
     # filenames only (your code can prefix them with data-storage or base-dir)
     json-file-name: monitorJson
