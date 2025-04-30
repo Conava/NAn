@@ -12,14 +12,15 @@ import org.springframework.stereotype.Service;
 public class MongoConnectionChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoConnectionChecker.class);
 
-    private final boolean remoteEnabled;
-    private final MongoClient client;
+    public final boolean remoteEnabled;
+    final MongoClient client;
 
     public MongoConnectionChecker(AppProperties props) {
         this.remoteEnabled = props.getDb().isRemoteEnabled();
         if (remoteEnabled) {
             // create client once
             this.client = MongoClients.create(props.getDb().getRemoteUrl());
+            System.out.println("Connected to MongoDB");
         } else {
             this.client = null;
         }
