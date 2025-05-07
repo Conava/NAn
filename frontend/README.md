@@ -27,6 +27,12 @@
     ```sh
     npm run dev
     ```
+3. IMPORTANT:
+   ```sh
+    To run the development server, the link to the locally hosted server must match up to the link
+    in line 48 of org/cs250/nan/backend/config/SecurityConfig.java. This is due a failure to get around
+    browser security issues during development, so the link had to be hardcoded in order to work. 
+   ```
 
 ## Build and Deployment:
 1. Build the project for production:
