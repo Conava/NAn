@@ -1,8 +1,22 @@
 # Vue 3 + TypeScript + Vite
 
 ## Dependencies:
-- Node.js
-- npm
+
+### Runtime
+- **vue** `^3.5.13`
+- **axios** `^1.8.4`
+
+### Dev
+- **vite** `^6.0.5`
+- **@vitejs/plugin-vue** `^5.2.1`
+- **typescript** `~5.6.2`
+- **vue-tsconfig** `^0.7.0`
+- **vue-tsc** `^2.2.0`
+
+### Styling
+- **tailwindcss**
+- **postcss**
+- **autoprefixer**
 
 ## Development:
 1. Install dependencies (once, after dependency changes):
@@ -13,6 +27,12 @@
     ```sh
     npm run dev
     ```
+3. IMPORTANT:
+   ```sh
+    To run the development server, the link to the locally hosted server must match up to the link
+    in line 48 of org/cs250/nan/backend/config/SecurityConfig.java. This is due a failure to get around
+    browser security issues during development, so the link had to be hardcoded in order to work. 
+   ```
 
 ## Build and Deployment:
 1. Build the project for production:

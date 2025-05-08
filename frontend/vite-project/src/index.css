@@ -25,12 +25,9 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  flex-direction: column;  /* Ensures content flows top to bottom */
-  align-items: flex-start;  /* Aligns content to the top-left */
-  justify-content: flex-start; /* Ensures content is at the top */
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  padding: 0;
 }
 
 h1 {
@@ -55,17 +52,6 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
