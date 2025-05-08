@@ -41,7 +41,8 @@ Follow these step-by-step instruction to quickly get NAn running on a Windows 11
 
 **Backend**
 1. Download the NAn project from GitHub using the main branch and extract to the desired directory.
-2. Download IntelliJ if you do not already have it.
+2. Download IntelliJ if you do not already have it.<br>
+   https://www.jetbrains.com/idea/download/?section=windows
 3. Open IntelliJ and navigate to "Plugins" on the left of the IntelliJ start up window.
 4. At the top of the Plugins panel there are two tabs, "Marketplace" and "Installed"; click "Installed".
 5. Scroll down slight to the "Build Tools" section and ensure both "Maven" and "Maven Extension" are active.
@@ -59,16 +60,9 @@ Be sure to click "Load" on the popup stating "Maven build script found". This is
 
 The backend is now setup and can be run via IntelliJ's built-in run button, with "Interactive Default" selected.
 
-**Frontend**
-1. In Project panel on the left, navigate to the "frontend" directory, beneath "docs", and expand it.
-2. Navigate to it's "src" directory and expand it.
-3. Double click "App.vue".
-4. A prompt to download Node.js will appear in the top right of IntelliJ. Click "Download Node.js".
-5. A popup will appear, click "Download".
-6. In the bottom left corner of IntelliJ, click the terminal icon arranged vertically among several others.
-7. In the new terminal window, type ```cd ./frontend```, or navigate the terminal to the frontend directory another way.
-8. Type ```npm install```; now you will be able to locally host an instance of the frontend.
-9. Refer to the frontend README.md to launch the frontend.
+The "Quick Launch" section in the frontend README picks up here for further instructions.
+
+
 
 ## Prerequisites
 
