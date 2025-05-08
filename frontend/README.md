@@ -18,6 +18,19 @@
 - **postcss**
 - **autoprefixer**
 
+## Quick Launch
+
+**Frontend**
+1. In the IntelliJ Project panel on the left, navigate to the "frontend" directory, beneath "docs", and expand it.
+2. Navigate to it's "src" directory and expand it.
+3. Double click "App.vue".
+4. A prompt to download Node.js will appear in the top right of IntelliJ. Click "Download Node.js".
+5. A popup will appear, click "Download".
+6. In the bottom left corner of IntelliJ, click the terminal icon arranged vertically among several others.
+7. In the new terminal window, type ```cd ./frontend```, or navigate the terminal to the frontend directory another way.
+8. Type ```npm install```; now you will be able to locally host an instance of the frontend.
+9. Refer to the frontend README.md to launch the frontend.
+
 ## Development:
 1. Install dependencies (once, after dependency changes):
     ```sh
