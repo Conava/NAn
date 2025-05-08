@@ -40,23 +40,24 @@ and analysis. It offers:
 Follow these step-by-step instruction to quickly get NAn running on a Windows 11 machine.
 
 **Backend**
-1. Download the NAn project from git and extract to the desired directory.
+1. Download the NAn project from GitHub using the main branch and extract to the desired directory.
 2. Download IntelliJ if you do not already have it.
 3. Open IntelliJ and navigate to "Plugins" on the left of the IntelliJ start up window.
 4. At the top of the Plugins panel there are two tabs, "Marketplace" and "Installed"; click "Installed".
 5. Scroll down slight to the "Build Tools" section and ensure both "Maven" and "Maven Extension" are active.
 6. Scroll back to the top and within the "Downloaded" section, look for "Spring Shell".
 7. If "Spring Shell" is listed, make sure it is activated by checking the box to it's left.
-8. If "Spring Shell" is not listed, click the "Marketplace" tab at the top of the panel
+8. If "Spring Shell" is not listed, click the "Marketplace" tab at the top of the panel.
 9. Search for "Spring Shell", download and enable the plugin.
 10. On the left side of the panel, at the top, click "Projects" to return to the main starting window of IntelliJ.
-11. Click "Open" and navigate to the directory where you extracted the Github project.
-12. Select the second "NAn-main" directory, and click "Select Folder".
+11. Click "Open" and navigate to the directory where you extracted the GitHub project.
+12. Select the second "NAn-main" directory (as extracting produces two "NAn-main" directories, one inside the other),<br>
+and click "Select Folder".
 13. **IMPORTANT:** When the project opens, there will be several popups in the bottom right corner.<br>
-Be sure to click "Load" on the popup stating "Maven build script found".
+Be sure to click "Load" on the popup stating "Maven build script found". This is essential to get the project to work.
 14. Allow the build script to run, there will be several loading bars in the right corner that rapidly complete.
 
-The backend is now setup and can be run via IntelliJ's built-in run button, using "Interactive Default".
+The backend is now setup and can be run via IntelliJ's built-in run button, with "Interactive Default" selected.
 
 **Frontend**
 1. In Project panel on the left, navigate to the "frontend" directory, beneath "docs", and expand it.
