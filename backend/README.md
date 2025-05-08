@@ -5,6 +5,7 @@
 - [Overview](#overview)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
+- [Quick Launch](#quick-launch)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
@@ -27,18 +28,52 @@ and analysis. It offers:
 
 ## Features
 
-- One-off scans (Wi-Fi + optional GPS)
+- One-off scans (Wi-Fi + optional GPS if hardware is available)
 - Continuous monitoring with JSON/CSV/KML outputs
 - Local (file) or remote (MongoDB) storage
 - Interactive shell commands
 - REST endpoints + Spring Boot Actuator
 - Async execution and scheduling
 
+## Quick Launch
+
+Follow these step-by-step instruction to quickly get NAn running on a Windows 11 machine.
+
+**Backend**
+1. Download the NAn project from git and extract to the desired directory.
+2. Download IntelliJ if you do not already have it.
+3. Open IntelliJ and navigate to "Plugins" on the left of the IntelliJ start up window.
+4. At the top of the Plugins panel there are two tabs, "Marketplace" and "Installed"; click "Installed".
+5. Scroll down slight to the "Build Tools" section and ensure both "Maven" and "Maven Extension" are active.
+6. Scroll back to the top and within the "Downloaded" section, look for "Spring Shell".
+7. If "Spring Shell" is listed, make sure it is activated by checking the box to it's left.
+8. If "Spring Shell" is not listed, click the "Marketplace" tab at the top of the panel
+9. Search for "Spring Shell", download and enable the plugin.
+10. On the left side of the panel, at the top, click "Projects" to return to the main starting window of IntelliJ.
+11. Click "Open" and navigate to the directory where you extracted the Github project.
+12. Select the second "NAn-main" directory, and click "Select Folder".
+13. **IMPORTANT:** When the project opens, there will be several popups in the bottom right corner.<br>
+Be sure to click "Load" on the popup stating "Maven build script found".
+14. Allow the build script to run, there will be several loading bars in the right corner that rapidly complete.
+
+The backend is now setup and can be run via IntelliJ's built-in run button, using "Interactive Default".
+
+**Frontend**
+1. In Project panel on the left, navigate to the "frontend" directory, beneath "docs", and expand it.
+2. Navigate to it's "src" directory and expand it.
+3. Double click "App.vue".
+4. A prompt to download Node.js will appear in the top right of IntelliJ. Click "Download Node.js".
+5. A popup will appear, click "Download".
+6. In the bottom left corner of IntelliJ, click the terminal icon arranged vertically among several others.
+7. In the new terminal window, type ```cd ./frontend```, or navigate the terminal to the frontend directory another way.
+8. Type ```npm install```; now you will be able to locally host an instance of the frontend.
+9. Refer to the frontend README.md to launch the frontend.
+
 ## Prerequisites
 
 - **Java JDK 23+**
 - **Maven 3.6+**
-- **OS**: Windows, Linux, or macOS
+- **OS**: Windows (full functionality), Linux (partial functionality)
 - **Optional**: IDE, cURL/Postman, MongoDB
 
 ## Installation
@@ -57,7 +92,7 @@ Java and Maven versions should be 23+ and 3.6+ respectively.
 3. **Optional**: Import as Maven project in your IDE.
 
 4. **Prerequisites**: 
-    - **Linux/macOS**: 
+    - **Linux**: 
       - Ensure you have `iw` and `gpsd` installed.
       - Enable sudo-less `iw` access:
         ```bash  
@@ -68,6 +103,7 @@ Java and Maven versions should be 23+ and 3.6+ respectively.
 5. **MongoDB** (optional)
    - Install MongoDB locally or use a remote instance.
    - Ensure MongoDB is running if using local storage.
+   - Settings file must be updated with your unique MongoDB uri and password if not using the testing uri.
 
 ## Configuration
 
@@ -87,7 +123,7 @@ app:
 
   # ─── General settings ──────────────────────────────────────────────────
   data-storage: ${app.base-dir}/data
-  default-use-gps: true
+  default-use-gps: false
   keep-history: true
   activate-gui: true
   log-file: ${app.base-dir}/log.txt
@@ -100,8 +136,8 @@ app:
   # ─── Monitoring defaults ───────────────────────────────────────────────
   monitor:
     scan-interval: 60        # seconds
-    gps-on: true
-    kml-output: true
+    gps-on: false
+    kml-output: false
     csv-output: false
 
     # filenames only (your code can prefix them with data-storage or base-dir)
