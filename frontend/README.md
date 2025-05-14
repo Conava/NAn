@@ -26,7 +26,7 @@
 3. Double click "App.vue".
 4. A prompt to download Node.js will appear in the top right of IntelliJ. Click "Download Node.js".
 5. A popup will appear, click "Download". If you already have Node installed, you'll need to copy the path from the<br>
-download panel, close the panel, clcik "Configure" in the top right of IntelliJ instead of "Download" and paste the<br>
+download panel, close the panel, click "Configure" in the top right of IntelliJ instead of "Download" and paste the<br>
 file path in the corresponding sections.
 6. In the bottom left corner of IntelliJ, click the terminal icon, arranged vertically among several others.
 7. In the new terminal window, type ```cd ./frontend```, or navigate the terminal to the frontend directory another way.
